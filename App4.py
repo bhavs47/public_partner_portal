@@ -143,14 +143,14 @@ age_col = get_col(df, col_map, ['age', 'years', 'age_years'])
 gender_col = get_col(df, col_map, ['what is your sex?'])
 ethnicity_col = get_col(df, col_map, ['ethnicity', 'race', 'ethnic_group'])
 expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
-disease_cols = ['1st Disease Experience','2nd Disease Experience', '3rd Disease Experience', '4th Disease Experience', '5th Disease Experience']
+#disease_cols = ['1st Disease Experience','2nd Disease Experience', '3rd Disease Experience', '4th Disease Experience', '5th Disease Experience']
 
-#Select diseases
-#columns = df.columns.tolist()
-#disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
-#if len(disease_cols) == 0:
-    #st.error("Please select at least one Disease/Condition column.")
-    #st.stop()
+Select diseases
+columns = df.columns.tolist()
+disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
+if len(disease_cols) == 0:
+    st.error("Please select at least one Disease/Condition column.")
+    st.stop()
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -257,3 +257,4 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
