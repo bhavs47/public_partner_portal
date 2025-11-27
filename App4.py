@@ -10,7 +10,6 @@ import streamlit as st
 import requests
 import streamlit as st
 import msal
-from msal import ConfidentialClientApplication
 import uuid
 import webbrowser
 
@@ -20,9 +19,9 @@ TENANT_ID = "bdeaeda8-c81d-45ce-863e-5232a535b7cb"
 CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
 CLIENT_SECRET = "Hq_8Q~qlGsweN6vve5ArZO.zTHrwPjdLlP1jmcLd"
 
-AUTHORITY = f"https://login.microsoftonline.com/bdeaeda8-c81d-45ce-863e-5232a535b7cb"
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_PATH = "/auth"
-REDIRECT_URI = "https://your-app-url/auth"
+REDIRECT_URI = "https://https://publicpartnerselection.streamlit.app//auth"
 SCOPE = ["User.Read"]
 
 # Initialize MSAL client
@@ -485,6 +484,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
