@@ -283,7 +283,7 @@ with search_col:
 # --- Build filters dict ---
 filters = {
     'disease_area': selected_disease,
-    'disease_cols': disease_cols,
+    'disease_cols': st.session_state.get("disease_cols", []),
 
     'gender': selected_gender,
     'gender_col': gender_col,
@@ -345,6 +345,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
