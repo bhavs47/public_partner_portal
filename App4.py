@@ -161,6 +161,12 @@ except requests.exceptions.RequestException as e:
     st.error(f"Failed to download file: {e}")
 except ValueError as e:
     st.error(f"Failed to read Excel file: {e}")
+
+# Adjust the index to start from 1 instead of 0
+df.index = df.index + 1
+
+# Display the DataFrame in Streamlit
+st.dataframe(df)
     
 # --- Upload section ---
 #st.markdown("### Manage Data / Upload")
@@ -357,6 +363,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
