@@ -173,58 +173,6 @@ sexualorientation_col = get_col(df, col_map, ['which of the following best descr
 carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
 expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
 
-# --- Session State Defaults ---
-#if "disease_cols" not in st.session_state:
-    #st.session_state["disease_cols"] = []
-
-#if "min_age" not in st.session_state:
-    #st.session_state["min_age"] = 0
-
-#if "max_age" not in st.session_state:
-    #st.session_state["max_age"] = 0
-
-#if "gender" not in st.session_state:
-    #st.session_state["gender"] = "Any"
-
-#if "ethnicity" not in st.session_state:
-    #st.session_state["ethnicity"] = "Any"
-
-#if "name_search" not in st.session_state:
-    #st.session_state["name_search"] = ""
-
-#if "expertise_search" not in st.session_state:
-    #st.session_state["expertise_search"] = ""
-
-#--- Disease Columns Selection ---
-#columns = df.columns.tolist()
-
-# Ensure default selections are valid
-#default_disease_cols = [col for col in st.session_state.get("disease_cols", []) if col in columns]
-
-#st.session_state["disease_cols"] = st.multiselect(
-    #"Select ALL Disease / Condition columns",
-    #columns,
-    #default=default_disease_cols
-#)
-
-#if len(st.session_state["disease_cols"]) == 0:
-    #st.error("Please select at least one Disease/Condition column.")
-    #st.stop()
-
-# --- Clear Filters Button ---
-#if st.button("Clear All Filters"):
-    # Reset all filter-related session_state variables
-    #st.session_state["disease_cols"] = []
-    #st.session_state["min_age"] = 0
-    #st.session_state["max_age"] = 0
-    #st.session_state["gender"] = "Any"
-    #st.session_state["ethnicity"] = "Any"
-    #st.session_state["name_search"] = ""
-    #st.session_state["expertise_search"] = ""
-    
-    # Re-run the app to apply cleared filters
-    #st.rerun()
-
 #Select diseases
 columns = df.columns.tolist()
 disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
@@ -268,22 +216,22 @@ if st.button("Clear All Filters", key="clear_filters_btn"):
     st.rerun()  # refresh the app to apply cleared filters
 
 with f1:
-    selected_disease = st.selectbox("Health Condition", disease_options)
+    selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
 with f2:
-    selected_gender = st.selectbox("Gender", gender_options)
+    selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
 with f3:
-    min_age_val = st.number_input("Min Age", min_value=0, max_value=120, value=0)
-    max_age_val = st.number_input("Max Age", min_value=0, max_value=120, value=120)
+    min_age_val = st.number_input("Min Age", min_value=0, max_value=120, key="min_age_val")
+    max_age_val = st.number_input("Max Age", min_value=0, max_value=120, key="max_age_val")
 with f4:
-    selected_carer = st.selectbox("Carer", carer_options)
+    selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
 
 g1, g2 = st.columns([2,2])
 with g1:
-    name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice")
+    name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice", key="name_search")
 with g2:
-    expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials")
+    expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
-eth_col = st.selectbox("Ethnicity", ethnicity_options)
+eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
 
 st.write("")
 search_col, export_col = st.columns([1,1])
@@ -356,6 +304,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
