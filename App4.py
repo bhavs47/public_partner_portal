@@ -240,7 +240,7 @@ if not name_col or not email_col:
 
 # --- Build disease options across all selected columns ---
 all_diseases = set()
-for col in st.session_state.get("disease_cols", []):
+for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
 
 disease_options = ["Any"] + sorted(all_diseases)
@@ -294,7 +294,7 @@ with search_col:
 # --- Build filters dict ---
 filters = {
     'disease_area': selected_disease,
-    'disease_cols': st.session_state.get("disease_cols", []),
+    'disease_cols': disease_cols,
 
     'gender': selected_gender,
     'gender_col': gender_col,
@@ -356,6 +356,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
