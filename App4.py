@@ -349,7 +349,8 @@ with res2:
     else:
         st.info("No results match your filters.")
 
-st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
+#st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
+st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 
 with st.expander("Show raw data (first 200 rows)"):
@@ -360,6 +361,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
