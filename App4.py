@@ -258,19 +258,6 @@ ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnic
 st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
-# --- Clear Filters Button ---
-if st.button("Clear All Filters", key="clear_filters_btn"):
-    st.session_state["selected_disease"] = "Any"
-    st.session_state["selected_gender"] = "Any"
-    st.session_state["min_age_val"] = 0
-    st.session_state["max_age_val"] = 120
-    st.session_state["selected_carer"] = "Any"
-    st.session_state["name_search"] = ""
-    st.session_state["expertise_search"] = ""
-    st.session_state["eth_col"] = "Any"
-    st.session_state["disease_cols"] = []
-    st.rerun()  # refresh the app to apply cleared filters
-
 with f1:
     selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
 with f2:
@@ -290,7 +277,19 @@ with g2:
     expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
 #eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
-
+# --- Clear Filters Button ---
+if st.button("Clear All Filters", key="clear_filters_btn"):
+    st.session_state["selected_disease"] = "Any"
+    st.session_state["selected_gender"] = "Any"
+    st.session_state["min_age_val"] = 0
+    st.session_state["max_age_val"] = 120
+    st.session_state["selected_carer"] = "Any"
+    st.session_state["name_search"] = ""
+    st.session_state["expertise_search"] = ""
+    st.session_state["eth_col"] = "Any"
+    st.session_state["disease_cols"] = []
+    st.rerun()  # refresh the app to apply cleared filters
+    
 st.write("")
 search_col, export_col = st.columns([1,1])
 with search_col:
@@ -366,6 +365,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
