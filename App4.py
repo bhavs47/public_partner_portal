@@ -76,30 +76,24 @@ def filter_dataframe(df, filters):
         d = d[d[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
 
     # Age filter
-    # First, validate the age limits
+    # Validate age limits
     if filters['max_age'] < filters['min_age']:
-        raise ValueError("Max Age cannot be less than Min Age.")
+        st.error("⚠️ Max Age cannot be less than Min Age.")
+        return d   # do NOT crash — return dataset unchanged
 
-    # Then apply the filter
     if filters['age_col']:
-        min_age = filters['min_age']
-        max_age = filters['max_age']
-
         d[filters['age_col'] + "_num"] = pd.to_numeric(
-        d[filters['age_col']], errors='coerce'
+            d[filters['age_col']], errors='coerce'
         )
-
-        before = len(d)
 
         d = d[
             d[filters['age_col'] + "_num"].between(
-                min_age, max_age, inclusive='both'
+                filters['min_age'], filters['max_age'], inclusive='both'
             )
         ]
 
         d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
 
-   
     #if filters['age_col']:
      #   d[filters['age_col'] + "_num"] = pd.to_numeric(d[filters['age_col']], errors='coerce')
       #  before = len(d)
@@ -293,6 +287,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
