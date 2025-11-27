@@ -136,7 +136,7 @@ def sample_dataframe():
 with st.container():
     col1, col2 = st.columns([3,1])
     with col1:
-        st.markdown("## Public Partner Search Tool")
+        st.markdown("## PECD Public Partner Search Tool")
         st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
     with col2:
         st.markdown("<div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>"
@@ -366,6 +366,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
