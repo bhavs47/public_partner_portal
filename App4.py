@@ -173,24 +173,62 @@ sexualorientation_col = get_col(df, col_map, ['which of the following best descr
 carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
 expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
 
-#Select diseases
+# --- Session State Defaults ---
+if "disease_cols" not in st.session_state:
+    st.session_state["disease_cols"] = []
+
+if "min_age" not in st.session_state:
+    st.session_state["min_age"] = 0
+
+if "max_age" not in st.session_state:
+    st.session_state["max_age"] = 0
+
+if "gender" not in st.session_state:
+    st.session_state["gender"] = "Any"
+
+if "ethnicity" not in st.session_state:
+    st.session_state["ethnicity"] = "Any"
+
+if "name_search" not in st.session_state:
+    st.session_state["name_search"] = ""
+
+if "expertise_search" not in st.session_state:
+    st.session_state["expertise_search"] = ""
+
+# --- Disease Columns Selection ---
 columns = df.columns.tolist()
-disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
-if len(disease_cols) == 0:
+st.session_state["disease_cols"] = st.multiselect(
+    "Select ALL Disease / Condition columns",
+    columns,
+    default=st.session_state["disease_cols"]
+)
+
+if len(st.session_state["disease_cols"]) == 0:
     st.error("Please select at least one Disease/Condition column.")
     st.stop()
 
-#Clear Filters
-if st.sidebar.button("Clear All Filters"):
-    st.session_state['disease_cols'] = "Any"
-    st.session_state['gender_cols'] = "Any"
-    st.session_state['ethnicity_cols'] = "Any"
-    st.session_state['carer_cols'] = "Any"
-    st.session_state['min_age'] = 0
-    st.session_state['max_age'] = 0
-    st.session_state['name_search'] = ""
-    st.session_state['expertise_search'] = ""
+# --- Clear Filters Button ---
+if st.button("Clear All Filters"):
+    # Reset all filter-related session_state variables
+    st.session_state["disease_cols"] = []
+    st.session_state["min_age"] = 0
+    st.session_state["max_age"] = 0
+    st.session_state["gender"] = "Any"
+    st.session_state["ethnicity"] = "Any"
+    st.session_state["name_search"] = ""
+    st.session_state["expertise_search"] = ""
+    
+    # Re-run the app to apply cleared filters
     st.rerun()
+
+#Select diseases
+#columns = df.columns.tolist()
+#disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
+#if len(disease_cols) == 0:
+    #st.error("Please select at least one Disease/Condition column.")
+    #st.stop()
+
+
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -303,6 +341,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
