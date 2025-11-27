@@ -330,10 +330,11 @@ results = filter_dataframe(df, filters)
 
 
 # --- Display table ---
-display_cols = [name_col, email_col]
-for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
-    if c and c not in display_cols:
-        display_cols.append(c)
+display_df = results  # show all columns
+#display_cols = [name_col, email_col]
+#for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
+    #if c and c not in display_cols:
+        #display_cols.append(c)
 
 display_df = results[display_cols]
 
@@ -365,6 +366,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
