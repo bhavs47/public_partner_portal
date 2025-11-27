@@ -105,12 +105,6 @@ def filter_dataframe(df, filters):
 
             d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
 
-    #if filters['age_col']:
-     #   d[filters['age_col'] + "_num"] = pd.to_numeric(d[filters['age_col']], errors='coerce')
-      #  before = len(d)
-       # d = d[d[filters['age_col'] + "_num"].between(filters['min_age'], filters['max_age'], inclusive='both')]
-        #d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
-
     # Name search
     if filters['name_search']:
         before = len(d)
@@ -178,7 +172,6 @@ transgender_col = get_col(df, col_map, ['do you identify as trans?'])
 sexualorientation_col = get_col(df, col_map, ['which of the following best describes your sexual orientation?'])
 carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
 expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
-#disease_cols = ['1st Disease Experience','2nd Disease Experience', '3rd Disease Experience', '4th Disease Experience', '5th Disease Experience']
 
 #Select diseases
 columns = df.columns.tolist()
@@ -186,6 +179,18 @@ disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
 if len(disease_cols) == 0:
     st.error("Please select at least one Disease/Condition column.")
     st.stop()
+
+#Clear Filters
+if st.sidebar.button("Clear All Filters"):
+    st.session_state['disease_cols'] = "Any"
+    st.session_state['gender_cols'] = "Any"
+    st.session_state['ethnicity_cols'] = "Any"
+    st.session_state['carer_cols'] = "Any"
+    st.session_state['min_age'] = 0
+    st.session_state['max_age'] = 0
+    st.session_state['name_search'] = ""
+    st.session_state['expertise_search'] = ""
+    st.rerun()
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -298,6 +303,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
