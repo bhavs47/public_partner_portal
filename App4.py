@@ -153,7 +153,7 @@ try:
 
     # Read Excel from bytes
     df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
-    st.success("Dataset already loaded successfully!")
+    #st.success("Dataset already loaded successfully!")
 
 except requests.exceptions.RequestException as e:
     st.error(f"Failed to download file: {e}")
@@ -355,6 +355,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
