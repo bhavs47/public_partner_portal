@@ -146,7 +146,7 @@ st.write("---")
 dataset_url = "https://github.com/bhavs47/public_partner_portal/blob/main/Database.xlsx"
 
 # Load dataset directly into pandas DataFrame
-df = pd.read_csv(dataset_url)
+df = pd.read_excel(dataset_url)
 
 # --- Upload section ---
 #st.markdown("### Manage Data / Upload")
@@ -321,6 +321,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
