@@ -119,14 +119,14 @@ def filter_dataframe(df, filters):
     return d
 
 
-#def sample_dataframe():
-    #data = [
-        #{"name": "Alice Smith", "email": "alice@example.com", "disease1": "Diabetes", "disease2": "", "age": 34, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
-        #{"name": "Bob Jones", "email": "bob@example.com", "disease1": "Cancer", "disease2": "Heart Disease", "age": 45, "gender": "Male", "ethnicity": "Black", "expertise": "patient advocacy"},
-        #{"name": "Cathy Brown", "email": "cathy@example.com", "disease1": "Cancer", "disease2": "", "age": 52, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
-        #{"name": "Daniel Green", "email": "daniel@example.com", "disease1": "Diabetes", "disease2": "Arthritis", "age": 60, "gender": "Male", "ethnicity": "Asian", "expertise": "research"},
-    #]
-    #return pd.DataFrame(data)
+def sample_dataframe():
+    data = [
+        {"name": "Alice Smith", "email": "alice@example.com", "disease1": "Diabetes", "disease2": "", "age": 34, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        {"name": "Bob Jones", "email": "bob@example.com", "disease1": "Cancer", "disease2": "Heart Disease", "age": 45, "gender": "Male", "ethnicity": "Black", "expertise": "patient advocacy"},
+        {"name": "Cathy Brown", "email": "cathy@example.com", "disease1": "Cancer", "disease2": "", "age": 52, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        {"name": "Daniel Green", "email": "daniel@example.com", "disease1": "Diabetes", "disease2": "Arthritis", "age": 60, "gender": "Male", "ethnicity": "Asian", "expertise": "research"},
+    ]
+    return pd.DataFrame(data)
 
 
 # --- UI Header ---
@@ -151,10 +151,10 @@ with u_col1:
 
 
 # Load file or sample
-#df = load_dataframe(uploaded_file)
-#if df is None:
-    #st.warning("No file uploaded — using a sample dataset for demo.")
-    #df = sample_dataframe()
+df = load_dataframe(uploaded_file)
+if df is None:
+    st.warning("No file uploaded — using a sample dataset for demo.")
+    df = sample_dataframe()
 
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
@@ -356,6 +356,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
