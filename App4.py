@@ -143,14 +143,23 @@ with st.container():
 
 st.write("---")
 
-# Example raw URL to your dataset on GitHub
-dataset_url = "https://github.com/bhavs47/public_partner_portal/blob/main/Database.xlsx"
-response = requests.get(dataset_url)
-response.raise_for_status()  # will throw an error if download fails
+# Raw GitHub URL (make sure it ends with .xlsx)
+dataset_url = "https://raw.githubusercontent.com/username/repository/branch/path/to/Database.xlsx"
 
-# Load dataset directly into pandas DataFrame
-df = pd.read_excel(dataset_url)
+try:
+    # Download the file content
+    response = requests.get(dataset_url)
+    response.raise_for_status()  # ensure download succeeded
 
+    # Read Excel from bytes
+    df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
+    st.success("Dataset loaded successfully!")
+
+except requests.exceptions.RequestException as e:
+    st.error(f"Failed to download file: {e}")
+except ValueError as e:
+    st.error(f"Failed to read Excel file: {e}")
+    
 # --- Upload section ---
 #st.markdown("### Manage Data / Upload")
 #u_col1, u_col2 = st.columns([3,1])
@@ -324,6 +333,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
