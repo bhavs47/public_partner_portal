@@ -11,7 +11,7 @@ import requests
 import streamlit as st
 import msal
 
-st.set_page_config(page_title="Public Partner Search Tool", layout="wide")
+st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
 
 # --- Helper functions ---
@@ -214,7 +214,7 @@ disease_cols = [col for col in df.columns if "Disease Experience" in col]
 # Guess columns (common names)
 name_col = get_col(df, col_map, ['name'])
 email_col = get_col(df, col_map, ['email id'])
-age_col = get_col(df, col_map, ['age', 'years', 'age_years'])
+age_col = get_col(df, col_map, ['age'])
 disability_col = get_col(df, col_map, ['do you consider yourself to be a disabled person?'])
 physical_col = get_col(df, col_map, ['do you have any physical or mental health conditions or illness lasting or expected to last for 12 months or more?'])
 ethnicity_col = get_col(df, col_map, ['what is your ethnic group? choose one option that best describes your ethnic group or background?'])
@@ -256,7 +256,7 @@ ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnic
 
 # --- Filters UI ---
 st.markdown("### Search Filters for Public Partners")
-f1, f2, f3, f4 = st.columns([2,2,2,2])
+f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
 # --- Clear Filters Button ---
 if st.button("Clear All Filters", key="clear_filters_btn"):
@@ -280,6 +280,8 @@ with f3:
     max_age_val = st.number_input("Max Age", min_value=0, max_value=120, key="max_age_val")
 with f4:
     selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
+with f5:
+    selected_ethnicity = st.selectbox("Ethnicity", ethnicity_options, key="selected_ethnicity")
 
 g1, g2 = st.columns([2,2])
 with g1:
@@ -287,7 +289,7 @@ with g1:
 with g2:
     expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
-eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
+#eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
 
 st.write("")
 search_col, export_col = st.columns([1,1])
@@ -305,9 +307,12 @@ filters = {
 
     'carer': selected_carer,
     'carer_col': carer_col,
-    
-    'ethnicity': eth_col,
+
+    'ethnicity': selected_ethnicity,
     'ethnicity_col': ethnicity_col,
+    
+    #'ethnicity': eth_col,
+    #'ethnicity_col': ethnicity_col,
 
     'min_age': min_age_val,
     'max_age': max_age_val,
@@ -361,6 +366,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
