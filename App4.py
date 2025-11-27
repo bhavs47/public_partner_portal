@@ -8,6 +8,8 @@ import json
 import pandas as pd
 import streamlit as st
 import requests
+pip install Office365-REST-Python-Client
+pip install pandas
 
 st.set_page_config(page_title="Public Partner Search Tool", layout="wide")
 
@@ -355,6 +357,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
