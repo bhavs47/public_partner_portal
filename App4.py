@@ -255,7 +255,7 @@ st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4 = st.columns([2,2,2,2])
 
 # --- Clear Filters Button ---
-if st.button("Clear All Filters"):
+if st.button("Clear All Filters", key="clear_filters_btn"):
     st.session_state["selected_disease"] = "Any"
     st.session_state["selected_gender"] = "Any"
     st.session_state["min_age_val"] = 0
@@ -356,6 +356,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
