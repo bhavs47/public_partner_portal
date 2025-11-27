@@ -314,10 +314,10 @@ if clear_clicked:
 #     st.session_state["disease_cols"] = []
 #     st.rerun()  # refresh the app to apply cleared filters
     
-st.write("")
-search_col, export_col = st.columns([1,1])
-with search_col:
-    do_search = st.button("🔍 Search Partners")
+# st.write("")
+# search_col, export_col = st.columns([1,1])
+# with search_col:
+#     do_search = st.button("🔍 Search Partners")
 
 
 # --- Build filters dict ---
@@ -419,6 +419,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
