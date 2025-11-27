@@ -194,7 +194,7 @@ if df is None:
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
-#this runs the Select All Disease/Conditional columns in the backend
+# --- Automatically detect disease columns ---
 disease_cols = [
     "1st Disease Experience",
     "2nd Disease Experience",
@@ -203,7 +203,6 @@ disease_cols = [
     "5th Disease Experience"
 ]
 
-# Optional: Verify these columns exist in your dataframe to avoid errors
 #disease_cols = [col for col in disease_cols if col in df.columns]
 disease_cols = [col for col in df.columns if "Disease Experience" in col]
 
@@ -238,6 +237,7 @@ if not name_col or not email_col:
 #all_diseases = set()
 #for col in disease_cols:
     #all_diseases.update(df[col].dropna().astype(str).unique())
+
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
@@ -322,7 +322,7 @@ results = filter_dataframe(df, filters)
 
 # --- Display table ---
 display_cols = [name_col, email_col]
-for c in st.session_state.get("disease_cols", []) + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
+for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
     if c and c not in display_cols:
         display_cols.append(c)
 
@@ -355,6 +355,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
