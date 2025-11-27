@@ -159,6 +159,17 @@ if df is None:
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
+disease_cols = [
+    "1st Disease Experience",
+    "2nd Disease Experience",
+    "3rd Disease Experience",
+    "4th Disease Experience",
+    "5th Disease Experience"
+]
+
+# Optional: Verify these columns exist in your dataframe to avoid errors
+disease_cols = [col for col in disease_cols if col in df.columns]
+
 # Guess columns (common names)
 name_col = get_col(df, col_map, ['name'])
 email_col = get_col(df, col_map, ['email id'])
@@ -174,11 +185,11 @@ carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
 expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
 
 #Select diseases
-columns = df.columns.tolist()
-disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
-if len(disease_cols) == 0:
-    st.error("Please select at least one Disease/Condition column.")
-    st.stop()
+#columns = df.columns.tolist()
+#disease_cols = st.multiselect("Select ALL Disease / Condition columns", columns)
+#if len(disease_cols) == 0:
+    #st.error("Please select at least one Disease/Condition column.")
+    #st.stop()
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -304,6 +315,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
