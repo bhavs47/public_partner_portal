@@ -277,18 +277,42 @@ with g2:
     expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
 #eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
-# --- Clear Filters Button ---
-if st.button("Clear All Filters", key="clear_filters_btn"):
+
+# --- Clear + Search Buttons Side by Side ---
+btn1, btn2 = st.columns([1,1])
+
+with btn1:
+    clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
+
+with btn2:
+    do_search = st.button("🔍 Search Partners")
+
+# Reset filters if Clear is clicked
+if clear_clicked:
     st.session_state["selected_disease"] = "Any"
     st.session_state["selected_gender"] = "Any"
     st.session_state["min_age_val"] = 0
     st.session_state["max_age_val"] = 120
     st.session_state["selected_carer"] = "Any"
+    st.session_state["selected_ethnicity"] = "Any"
     st.session_state["name_search"] = ""
     st.session_state["expertise_search"] = ""
     st.session_state["eth_col"] = "Any"
     st.session_state["disease_cols"] = []
-    st.rerun()  # refresh the app to apply cleared filters
+    st.rerun()
+
+# --- Clear Filters Button ---
+# if st.button("Clear All Filters", key="clear_filters_btn"):
+#     st.session_state["selected_disease"] = "Any"
+#     st.session_state["selected_gender"] = "Any"
+#     st.session_state["min_age_val"] = 0
+#     st.session_state["max_age_val"] = 120
+#     st.session_state["selected_carer"] = "Any"
+#     st.session_state["name_search"] = ""
+#     st.session_state["expertise_search"] = ""
+#     st.session_state["eth_col"] = "Any"
+#     st.session_state["disease_cols"] = []
+#     st.rerun()  # refresh the app to apply cleared filters
     
 st.write("")
 search_col, export_col = st.columns([1,1])
@@ -395,6 +419,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
