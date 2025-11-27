@@ -166,12 +166,30 @@ except ValueError as e:
 #with u_col1:
     #uploaded_file = st.file_uploader("Upload participants file (Excel .xlsx/.xls or .csv)", type=["xlsx","xls","csv"])
 
+def load_dataframe_from_github(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
+        return df
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to download file: {e}")
+        return None
+    except ValueError as e:
+        st.error(f"Failed to read Excel file: {e}")
+        return None
+
+# Load the dataset
+df = load_dataframe_from_github(dataset_url)
+if df is None:
+    st.stop()  # stop the app if loading failed
+
 
 # Load file or sample
-df = load_dataframe(uploaded_file)
-if df is None:
-    st.warning("No file uploaded — using a sample dataset for demo.")
-    df = sample_dataframe()
+#df = load_dataframe(uploaded_file)
+#if df is None:
+    #st.warning("No file uploaded — using a sample dataset for demo.")
+    #df = sample_dataframe()
 
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
@@ -333,6 +351,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
