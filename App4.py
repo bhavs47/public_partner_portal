@@ -119,14 +119,14 @@ def filter_dataframe(df, filters):
     return d
 
 
-def sample_dataframe():
-    data = [
-        {"name": "Alice Smith", "email": "alice@example.com", "disease1": "Diabetes", "disease2": "", "age": 34, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
-        {"name": "Bob Jones", "email": "bob@example.com", "disease1": "Cancer", "disease2": "Heart Disease", "age": 45, "gender": "Male", "ethnicity": "Black", "expertise": "patient advocacy"},
-        {"name": "Cathy Brown", "email": "cathy@example.com", "disease1": "Cancer", "disease2": "", "age": 52, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
-        {"name": "Daniel Green", "email": "daniel@example.com", "disease1": "Diabetes", "disease2": "Arthritis", "age": 60, "gender": "Male", "ethnicity": "Asian", "expertise": "research"},
-    ]
-    return pd.DataFrame(data)
+#def sample_dataframe():
+    #data = [
+        #{"name": "Alice Smith", "email": "alice@example.com", "disease1": "Diabetes", "disease2": "", "age": 34, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        #{"name": "Bob Jones", "email": "bob@example.com", "disease1": "Cancer", "disease2": "Heart Disease", "age": 45, "gender": "Male", "ethnicity": "Black", "expertise": "patient advocacy"},
+        #{"name": "Cathy Brown", "email": "cathy@example.com", "disease1": "Cancer", "disease2": "", "age": 52, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        #{"name": "Daniel Green", "email": "daniel@example.com", "disease1": "Diabetes", "disease2": "Arthritis", "age": 60, "gender": "Male", "ethnicity": "Asian", "expertise": "research"},
+    #]
+    #return pd.DataFrame(data)
 
 
 # --- UI Header ---
@@ -231,8 +231,6 @@ if st.button("Clear All Filters"):
 #if len(disease_cols) == 0:
     #st.error("Please select at least one Disease/Condition column.")
     #st.stop()
-
-
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -253,8 +251,21 @@ ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnic
 
 
 # --- Filters UI ---
-st.markdown("### Search Filters")
+st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4 = st.columns([2,2,2,2])
+
+# --- Clear Filters Button ---
+if st.button("Clear All Filters"):
+    st.session_state["selected_disease"] = "Any"
+    st.session_state["selected_gender"] = "Any"
+    st.session_state["min_age_val"] = 0
+    st.session_state["max_age_val"] = 120
+    st.session_state["selected_carer"] = "Any"
+    st.session_state["name_search"] = ""
+    st.session_state["expertise_search"] = ""
+    st.session_state["eth_col"] = "Any"
+    st.session_state["disease_cols"] = []
+    st.rerun()  # refresh the app to apply cleared filters
 
 with f1:
     selected_disease = st.selectbox("Health Condition", disease_options)
@@ -345,6 +356,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
