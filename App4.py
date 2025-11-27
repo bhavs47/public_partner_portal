@@ -204,7 +204,8 @@ disease_cols = [
 ]
 
 # Optional: Verify these columns exist in your dataframe to avoid errors
-disease_cols = [col for col in disease_cols if col in df.columns]
+#disease_cols = [col for col in disease_cols if col in df.columns]
+disease_cols = [col for col in df.columns if "Disease Experience" in col]
 
 # Guess columns (common names)
 name_col = get_col(df, col_map, ['name'])
@@ -234,6 +235,9 @@ if not name_col or not email_col:
     st.stop()
 
 # --- Build disease options across all selected columns ---
+#all_diseases = set()
+#for col in disease_cols:
+    #all_diseases.update(df[col].dropna().astype(str).unique())
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
@@ -351,6 +355,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
