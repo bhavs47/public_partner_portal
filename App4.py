@@ -197,10 +197,14 @@ if "expertise_search" not in st.session_state:
 
 # --- Disease Columns Selection ---
 columns = df.columns.tolist()
+
+# Ensure default selections are valid
+default_disease_cols = [col for col in st.session_state.get("disease_cols", []) if col in columns]
+
 st.session_state["disease_cols"] = st.multiselect(
     "Select ALL Disease / Condition columns",
     columns,
-    default=st.session_state["disease_cols"]
+    default=default_disease_cols
 )
 
 if len(st.session_state["disease_cols"]) == 0:
@@ -341,6 +345,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
