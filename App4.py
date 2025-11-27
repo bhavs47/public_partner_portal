@@ -143,7 +143,7 @@ age_col = get_col(df, col_map, ['age', 'years', 'age_years'])
 disability_col = get_col(df, col_map, ['do you consider yourself to be a disabled person?'])
 physical_col = get_col(df, col_map, ['do you have any physical or mental health conditions or illness lasting or expected to last for 12 months or more?'])
 ethnicity_col = get_col(df, col_map, ['what is your ethnic group? Choose one option that best describes your ethnic group or background?'])
-religion_col = get_col(df, col_map, ['what is your religion?']
+religion_col = get_col(df, col_map, ['what is your religion?'])
 gender_col = get_col(df, col_map, ['what is your sex?'])
 transgender_col = get_col(df, col_map, ['do you identify as trans?'])
 sexualorientation_col = get_col(df, col_map, ['which of the following best describes your sexual orientation?'])
@@ -263,6 +263,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
