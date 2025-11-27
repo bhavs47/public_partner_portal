@@ -172,6 +172,7 @@ for col in disease_cols:
 disease_options = ["Any"] + sorted(all_diseases)
 
 gender_options = ["Any"] if not gender_col else ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
+carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dropna().astype(str).unique())
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
 
 
@@ -186,6 +187,8 @@ with f2:
 with f3:
     min_age_val = st.number_input("Min Age", min_value=0, max_value=120, value=0)
     max_age_val = st.number_input("Max Age", min_value=0, max_value=120, value=120)
+with f4:
+    selected_carer = st.selectbox("Carer", carer_options)
 
 g1, g2 = st.columns([2,2])
 with g1:
@@ -263,6 +266,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
