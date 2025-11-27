@@ -76,23 +76,34 @@ def filter_dataframe(df, filters):
         d = d[d[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
 
     # Age filter
-    # Validate age limits
-    if filters['max_age'] < filters['min_age']:
-        st.error("⚠️ Max Age cannot be less than Min Age.")
-        return d   # do NOT crash — return dataset unchanged
+    min_age = filters['min_age']
+    max_age = filters['max_age']
 
-    if filters['age_col']:
-        d[filters['age_col'] + "_num"] = pd.to_numeric(
-            d[filters['age_col']], errors='coerce'
-        )
+    # CASE 1: Age not entered → skip filtering
+    # (Assuming empty age inputs become 0 — adjust if needed)
+    if (min_age == 0 and max_age == 0) or (min_age is None and max_age is None):
+        # No age filter — return other filters' results
+        pass  # do nothing and continue with other filters
 
-        d = d[
-            d[filters['age_col'] + "_num"].between(
-                filters['min_age'], filters['max_age'], inclusive='both'
+    else:
+        # CASE 2: Invalid range → show message (no crash)
+        if max_age < min_age:
+            st.error("⚠️ Max Age cannot be less than Min Age.")
+            return d  # return unfiltered (except for other filters already applied)
+
+        # CASE 3: Valid range → apply age filter
+        if filters['age_col']:
+            d[filters['age_col'] + "_num"] = pd.to_numeric(
+                d[filters['age_col']], errors='coerce'
             )
-        ]
 
-        d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
+            d = d[
+                d[filters['age_col'] + "_num"].between(
+                    min_age, max_age, inclusive='both'
+                )
+            ]
+
+            d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
 
     #if filters['age_col']:
      #   d[filters['age_col'] + "_num"] = pd.to_numeric(d[filters['age_col']], errors='coerce')
@@ -287,6 +298,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
