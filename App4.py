@@ -7,6 +7,7 @@ from io import BytesIO
 import json
 import pandas as pd
 import streamlit as st
+import requests
 
 st.set_page_config(page_title="Public Partner Search Tool", layout="wide")
 
@@ -144,6 +145,8 @@ st.write("---")
 
 # Example raw URL to your dataset on GitHub
 dataset_url = "https://github.com/bhavs47/public_partner_portal/blob/main/Database.xlsx"
+response = requests.get(dataset_url)
+response.raise_for_status()  # will throw an error if download fails
 
 # Load dataset directly into pandas DataFrame
 df = pd.read_excel(dataset_url)
@@ -321,6 +324,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
