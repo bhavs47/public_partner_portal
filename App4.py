@@ -178,7 +178,7 @@ ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnic
 
 # --- Filters UI ---
 st.markdown("### Search Filters")
-f1, f2, f3 = st.columns([2,2,2])
+f1, f2, f3, f4 = st.columns([2,2,2,2])
 
 with f1:
     selected_disease = st.selectbox("Health Condition", disease_options)
@@ -269,6 +269,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
