@@ -353,14 +353,15 @@ with res2:
 st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 
-with st.expander("Show raw data (first 200 rows)"):
-    st.dataframe(df.head(200))
+with st.expander("Show Full Data"):
+    st.dataframe(df.head(2000), hide_index=True)
 
 st.markdown("---")
 st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
