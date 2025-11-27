@@ -142,12 +142,17 @@ with st.container():
 
 st.write("---")
 
+# Example raw URL to your dataset on GitHub
+dataset_url = "https://github.com/bhavs47/public_partner_portal/blob/main/Database.xlsx"
+
+# Load dataset directly into pandas DataFrame
+df = pd.read_csv(dataset_url)
 
 # --- Upload section ---
-st.markdown("### Manage Data / Upload")
-u_col1, u_col2 = st.columns([3,1])
-with u_col1:
-    uploaded_file = st.file_uploader("Upload participants file (Excel .xlsx/.xls or .csv)", type=["xlsx","xls","csv"])
+#st.markdown("### Manage Data / Upload")
+#u_col1, u_col2 = st.columns([3,1])
+#with u_col1:
+    #uploaded_file = st.file_uploader("Upload participants file (Excel .xlsx/.xls or .csv)", type=["xlsx","xls","csv"])
 
 
 # Load file or sample
@@ -159,6 +164,7 @@ if df is None:
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
+#this runs the Select All Disease/Conditional columns in the backend
 disease_cols = [
     "1st Disease Experience",
     "2nd Disease Experience",
@@ -315,6 +321,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
