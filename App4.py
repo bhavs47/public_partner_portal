@@ -151,10 +151,10 @@ with u_col1:
 
 
 # Load file or sample
-df = load_dataframe(uploaded_file)
-if df is None:
-    st.warning("No file uploaded — using a sample dataset for demo.")
-    df = sample_dataframe()
+#df = load_dataframe(uploaded_file)
+#if df is None:
+    #st.warning("No file uploaded — using a sample dataset for demo.")
+    #df = sample_dataframe()
 
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
@@ -356,6 +356,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
