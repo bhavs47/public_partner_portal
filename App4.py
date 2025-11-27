@@ -77,10 +77,30 @@ def filter_dataframe(df, filters):
 
     # Age filter
     if filters['age_col']:
-        d[filters['age_col'] + "_num"] = pd.to_numeric(d[filters['age_col']], errors='coerce')
-        before = len(d)
-        d = d[d[filters['age_col'] + "_num"].between(filters['min_age'], filters['max_age'], inclusive='both')]
-        d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
+    min_age = filters['min_age']
+    max_age = filters['max_age']
+
+    # Skip filtering if invalid limits
+    if max_age < min_age:
+        raise ValueError("Max Age must be greater than or equal to Min Age.")
+
+    d[filters['age_col'] + "_num"] = pd.to_numeric(
+        d[filters['age_col']], errors='coerce'
+    )
+    before = len(d)
+    d = d[
+        d[filters['age_col'] + "_num"].between(
+            min_age, max_age, inclusive='both'
+        )
+    ]
+    d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
+
+    
+    #if filters['age_col']:
+     #   d[filters['age_col'] + "_num"] = pd.to_numeric(d[filters['age_col']], errors='coerce')
+      #  before = len(d)
+       # d = d[d[filters['age_col'] + "_num"].between(filters['min_age'], filters['max_age'], inclusive='both')]
+        #d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
 
     # Name search
     if filters['name_search']:
@@ -269,6 +289,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
