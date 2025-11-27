@@ -4,3 +4,5 @@ openpyxl
 numpy
 msal
 requests
+uuid
+webbrowser
