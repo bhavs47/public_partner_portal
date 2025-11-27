@@ -137,12 +137,12 @@ if df is None:
 df, col_map = normalize_cols(df)
 
 # Guess columns (common names)
-name_col = get_col(df, col_map, ['name', 'full_name', 'participant_name'])
-email_col = get_col(df, col_map, ['email', 'email_address', 'e-mail', 'email id'])
+name_col = get_col(df, col_map, ['name'])
+email_col = get_col(df, col_map, ['email id'])
 age_col = get_col(df, col_map, ['age', 'years', 'age_years'])
 gender_col = get_col(df, col_map, ['what is your sex?'])
-ethnicity_col = get_col(df, col_map, ['ethnicity', 'race', 'ethnic_group'])
-expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
+ethnicity_col = get_col(df, col_map, ['do you have any physical or mental health conditions or illness lasting or expected to last for 12 months or more?'])
+#expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
 #disease_cols = ['1st Disease Experience','2nd Disease Experience', '3rd Disease Experience', '4th Disease Experience', '5th Disease Experience']
 
 #Select diseases
@@ -257,5 +257,6 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
