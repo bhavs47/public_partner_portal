@@ -13,8 +13,9 @@ import uuid
 
 st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
-TENANT_ID = "bdeaeda8-c81d-45ce-863e-5232a535b7cb"
-CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
+TENANT_ID = st.secrets["TENANT_ID"]
+CLIENT_ID = st.secrets["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
@@ -23,6 +24,7 @@ SCOPE = ["User.Read"]
 app = msal.PublicClientApplication(
     CLIENT_ID,
     authority=AUTHORITY
+    client_credential=CLIENT_SECRET
 )
 
 def login():
@@ -51,7 +53,7 @@ if "code" not in query_params:
 code = query_params["code"][0]
 
 token_result = app.acquire_token_by_authorization_code(
-    code=code,
+    code,
     scopes=SCOPE,
     redirect_uri=REDIRECT_URI
 )
@@ -478,6 +480,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
