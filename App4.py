@@ -230,7 +230,8 @@ with st.container():
 st.write("---")
 
 # Raw GitHub URL (make sure it ends with .xlsx)
-dataset_url = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/Database.xlsx"
+dataset_url = "https://github.com/bhavs47/public_partner_portal/blob/main/Database.xlsx"
+#dataset_url = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/Database.xlsx" 
 
 try:
     # Download the file content
@@ -503,6 +504,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
