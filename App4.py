@@ -24,23 +24,15 @@ REDIRECT_URI = st.secrets["REDIRECT_URI"]
 ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
 SCOPE = ["User.Read"]
 
-# -----------------------------
-# 2️⃣ Initialize MSAL PublicClientApplication
-# -----------------------------
-app = PublicClientApplication(
-    client_id=CLIENT_ID,
-    authority=f"https://login.microsoftonline.com/{TENANT_ID}"
-)
+# --- Initialize MSAL ---
+app = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
 
-# -----------------------------
-# 3️⃣ Generate login URL
-# -----------------------------
+# --- Simple login test ---
 def login():
     auth_url = app.get_authorization_request_url(
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
-        state=str(uuid.uuid4()),  # unique state per request for CSRF protection
-        prompt="select_account"
+        state=str(uuid.uuid4())
     )
     st.markdown(
         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
@@ -49,46 +41,88 @@ def login():
         unsafe_allow_html=True
     )
 
-# -----------------------------
-# 4️⃣ Handle OAuth2 callback
-# -----------------------------
-query_params = st.experimental_get_query_params()
+# --- Test if secrets are loaded ---
+st.write("✅ Secrets loaded successfully:")
+st.write("CLIENT_ID:", CLIENT_ID)
+st.write("REDIRECT_URI:", REDIRECT_URI)
 
-if "code" not in query_params:
-    st.title("🔐 Public Partner Portal Login")
-    login()
-    st.stop()
+# --- Only show login button ---
+st.title("Test MSAL Login")
+login()
 
-code = query_params["code"][0]
 
-# Acquire token using the authorization code
-try:
-    token_result = app.acquire_token_by_authorization_code(
-        code=code,
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI
-    )
-except Exception as e:
-    st.error(f"Authentication exception: {e}")
-    st.stop()
 
-# Check if token was acquired successfully
-if "access_token" not in token_result:
-    st.error("❌ Authentication failed.")
-    st.json(token_result)
-    st.stop()
+
+
+
+
+
 
 # -----------------------------
-# 5️⃣ Verify email access
+# 2️⃣ Initialize MSAL PublicClientApplication
 # -----------------------------
-email = token_result["id_token_claims"].get("preferred_username")
-st.session_state["user_email"] = email
+# app = PublicClientApplication(
+#     client_id=CLIENT_ID,
+#     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
+# )
 
-if email not in ALLOWED_EMAILS:
-    st.error("❌ You do not have permission to access this tool.")
-    st.stop()
+# # -----------------------------
+# # 3️⃣ Generate login URL
+# # -----------------------------
+# def login():
+#     auth_url = app.get_authorization_request_url(
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI,
+#         state=str(uuid.uuid4()),  # unique state per request for CSRF protection
+#         prompt="select_account"
+#     )
+#     st.markdown(
+#         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
+#         f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+#         f'Sign in with Microsoft</a>',
+#         unsafe_allow_html=True
+#     )
 
-st.success(f"✅ Signed in as {email}")
+# # -----------------------------
+# # 4️⃣ Handle OAuth2 callback
+# # -----------------------------
+# query_params = st.experimental_get_query_params()
+
+# if "code" not in query_params:
+#     st.title("🔐 Public Partner Portal Login")
+#     login()
+#     st.stop()
+
+# code = query_params["code"][0]
+
+# # Acquire token using the authorization code
+# try:
+#     token_result = app.acquire_token_by_authorization_code(
+#         code=code,
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI
+#     )
+# except Exception as e:
+#     st.error(f"Authentication exception: {e}")
+#     st.stop()
+
+# # Check if token was acquired successfully
+# if "access_token" not in token_result:
+#     st.error("❌ Authentication failed.")
+#     st.json(token_result)
+#     st.stop()
+
+# # -----------------------------
+# # 5️⃣ Verify email access
+# # -----------------------------
+# email = token_result["id_token_claims"].get("preferred_username")
+# st.session_state["user_email"] = email
+
+# if email not in ALLOWED_EMAILS:
+#     st.error("❌ You do not have permission to access this tool.")
+#     st.stop()
+
+# st.success(f"✅ Signed in as {email}")
 
 
 
@@ -503,6 +537,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
