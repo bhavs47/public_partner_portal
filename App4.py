@@ -16,91 +16,79 @@ import uuid
 # -----------------------------
 st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
-# Load secrets
+# 1️⃣ Load secrets safely
 # -----------------------------
 TENANT_ID = st.secrets["TENANT_ID"]
 CLIENT_ID = st.secrets["CLIENT_ID"]
-CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 REDIRECT_URI = st.secrets["REDIRECT_URI"]
-ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]
-
-AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-SCOPES = ["User.Read"]
+ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
+SCOPE = ["User.Read"]
 
 # -----------------------------
-# MSAL app setup
+# 2️⃣ Initialize MSAL PublicClientApplication
 # -----------------------------
-app = ConfidentialClientApplication(
+app = PublicClientApplication(
     client_id=CLIENT_ID,
-    client_credential=CLIENT_SECRET,
-    authority=AUTHORITY
+    authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
 # -----------------------------
-# Helper function: generate login URL
+# 3️⃣ Generate login URL
 # -----------------------------
 def login():
-    if "auth_state" not in st.session_state:
-        st.session_state["auth_state"] = str(uuid.uuid4())
-
     auth_url = app.get_authorization_request_url(
-        scopes=SCOPES,
+        scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
-        state=st.session_state["auth_state"]
+        state=str(uuid.uuid4()),  # unique state per request for CSRF protection
+        prompt="select_account"
     )
-
     st.markdown(
         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-        'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-        'Sign in with Microsoft</a>',
+        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+        f'Sign in with Microsoft</a>',
         unsafe_allow_html=True
     )
 
 # -----------------------------
-# Handle OAuth redirect
+# 4️⃣ Handle OAuth2 callback
 # -----------------------------
 query_params = st.experimental_get_query_params()
 
-# Step 1: if no code, show login button
 if "code" not in query_params:
     st.title("🔐 Public Partner Portal Login")
     login()
     st.stop()
 
-# Step 2: check state for CSRF protection
-if "state" not in query_params or query_params["state"][0] != st.session_state.get("auth_state"):
-    st.error("Invalid state. Possible CSRF attack.")
+code = query_params["code"][0]
+
+# Acquire token using the authorization code
+try:
+    token_result = app.acquire_token_by_authorization_code(
+        code=code,
+        scopes=SCOPE,
+        redirect_uri=REDIRECT_URI
+    )
+except Exception as e:
+    st.error(f"Authentication exception: {e}")
     st.stop()
 
-# Step 3: acquire token
-code = query_params["code"][0]
-token_result = app.acquire_token_by_authorization_code(
-    code=code,
-    scopes=SCOPES,
-    redirect_uri=REDIRECT_URI
-)
-
+# Check if token was acquired successfully
 if "access_token" not in token_result:
-    st.error("Authentication failed.")
+    st.error("❌ Authentication failed.")
     st.json(token_result)
     st.stop()
 
-# Step 4: store user email
-email = token_result["id_token_claims"]["preferred_username"]
+# -----------------------------
+# 5️⃣ Verify email access
+# -----------------------------
+email = token_result["id_token_claims"].get("preferred_username")
 st.session_state["user_email"] = email
 
-# Step 5: restrict access
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-st.success(f"Signed in as {email}")
-
-# -----------------------------
-# Your main app code starts here
-# -----------------------------
-st.title("PECD Public Partner Search Tool")
-st.write("Welcome to the portal!")
+st.success(f"✅ Signed in as {email}")
 
 
 
@@ -515,6 +503,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
