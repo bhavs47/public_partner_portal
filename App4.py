@@ -21,7 +21,7 @@ CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
 SCOPE = ["User.Read"]
-ALLOWED_EMAILS = ["qghd143@leeds.ac.uk"]
+# ALLOWED_EMAILS = ["qghd143@leeds.ac.uk"]
 
 # -----------------------------
 # MSAL App
@@ -43,9 +43,9 @@ def login():
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
         state=state,
-        prompt="select_account",
-        code_challenge="abcd",           # Simple PKCE challenge for demo
-        code_challenge_method="plain"
+        # prompt="select_account",
+        # code_challenge="abcd",           # Simple PKCE challenge for demo
+        # code_challenge_method="plain"
     )
 
     st.markdown(
@@ -54,36 +54,27 @@ def login():
         f'Sign in with Microsoft</a>',
         unsafe_allow_html=True
     )
-    st.stop()
+    # st.stop()
 
 # -----------------------------
 # Main Authentication Logic
 # -----------------------------
 query_params = st.experimental_get_query_params()
 
-# If we already have a valid access token, skip login
-if "access_token" in st.session_state:
-    user_email = st.session_state.get("user_email")
-    st.success(f"Signed in as {user_email}")
+# Step 1: Show login if no token in session state
+if "access_token" not in st.session_state:
+    
+    # Step 2: If redirected from MS login with 'code'
+    if "code" in query_params:
+        code = query_params["code"][0]
+        received_state = query_params.get("state", [None])[0]
 
-    if user_email not in ALLOWED_EMAILS:
-        st.error("❌ You do not have permission to access this tool.")
-        st.stop()
-
-else:
-    # Step 1: User is redirected back with ?code=...&state=...
-    if "code" in query_params and "state" in query_params:
-        received_state = query_params["state"][0]
-        saved_state = st.session_state.get("auth_state")
-
-        # CSRF check
-        if saved_state is None or received_state != saved_state:
+        # Validate state to prevent CSRF
+        if received_state != st.session_state.get("auth_state"):
             st.error("Invalid state. Possible CSRF attack.")
             st.stop()
 
-        code = query_params["code"][0]
-
-        # Step 2: Redeem code for token
+        # Acquire token using the authorization code
         token_result = app.acquire_token_by_authorization_code(
             code=code,
             scopes=SCOPE,
@@ -95,132 +86,34 @@ else:
             st.json(token_result)
             st.stop()
 
-        # Step 3: Store in session_state and clear query params
+        # Store token and email in session state
         st.session_state["access_token"] = token_result["access_token"]
-        st.session_state["user_email"] = token_result["id_token_claims"].get("preferred_username")
-        st.experimental_set_query_params()  # removes ?code=...&state=...
+        st.session_state["user_email"] = token_result["id_token_claims"]["preferred_username"]
 
-        # Step 4: Check permissions
-        user_email = st.session_state["user_email"]
-        if user_email not in ALLOWED_EMAILS:
-            st.error("❌ You do not have permission to access this tool.")
-            st.stop()
+        # Clear query parameters to avoid reuse of code/state
+        st.experimental_set_query_params()
 
-        st.success(f"Signed in as {user_email}")
-
-    # Step 5: No code in URL -> show login button
     else:
+        st.title("🔐 Public Partner Portal Login")
         login()
+        st.stop()
 
 # -----------------------------
-# Protected App Content
+# Authorization Check
 # -----------------------------
-st.title("Welcome to PECD Public Partner Search Tool")
-st.write("Your protected content goes here.")
+allowed_emails = ["bhavya.nair@nihr.ac.uk"]
+email = st.session_state["user_email"]
 
-#Previous Code 
-#----------------
-# st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
+if email not in allowed_emails:
+    st.error("❌ You do not have permission to access this tool.")
+    st.stop()
 
-# TENANT_ID = st.secrets["TENANT_ID"]
-# CLIENT_ID = st.secrets["CLIENT_ID"]
-# CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+st.success(f"Signed in as {email}")
 
-# AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-# REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
-# SCOPE = ["User.Read"]
-
-# # app = msal.PublicClientApplication(
-# #     CLIENT_ID,
-# #     authority=AUTHORITY,
-# #     client_credential=CLIENT_SECRET
-# # )
-
-# # Access control: allowed users
-# # -------------------------
-# ALLOWED_EMAILS = ["qghd143@leeds.ac.uk"]
-
-# # Initialize MSAL Confidential Client
-# # -------------------------
-# app = msal.ConfidentialClientApplication(
-#     CLIENT_ID,
-#     authority=AUTHORITY,
-#     client_credential=CLIENT_SECRET
-# )
-
-# # Helper function: login button
-# # -------------------------
-# def login_button():
-#     state = str(uuid.uuid4())
-#     st.session_state["auth_state"] = state
-#     auth_url = app.get_authorization_request_url(
-#         scopes=SCOPE,
-#         redirect_uri=REDIRECT_URI,
-#         state=state,
-#         prompt="select_account"
-#     )
-#     st.markdown(
-#         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-#         f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-#         f'Sign in with Microsoft</a>',
-#         unsafe_allow_html=True
-#     )
-
-# # Main authentication logic
-# # -------------------------
-# query_params = st.experimental_get_query_params()
-
-# # Step 1: If token not in session, check for code
-# if "access_token" not in st.session_state:
-#     if "code" in query_params:
-#         # Check if state exists in session
-#         saved_state = st.session_state.get("auth_state", None)
-#         received_state = query_params.get("state", [None])[0]
-
-#         if saved_state is not None and received_state != saved_state:
-#             st.error("Invalid state. Possible CSRF attack.")
-#             st.stop()
-        
-#         # Redeem code
-#         code = query_params["code"][0]
-#         token_result = app.acquire_token_by_authorization_code(
-#             code=code,
-#             scopes=SCOPE,
-#             redirect_uri=REDIRECT_URI
-#         )
-
-#         if "access_token" not in token_result:
-#             st.error("Authentication failed.")
-#             st.json(token_result)
-#             st.stop()
-
-#         # Store token and email
-#         st.session_state["access_token"] = token_result["access_token"]
-#         st.session_state["user_email"] = token_result["id_token_claims"].get("preferred_username")
-
-#         # Clear query params to prevent code reuse
-#         st.experimental_set_query_params()
-#     else:
-#         # Step 2: No token and no code -> show login button
-#         st.title("🔐 Public Partner Portal Login")
-#         login_button()
-#         st.stop()
-
-# # Step 3: Access control
-# # -------------------------
-# user_email = st.session_state["user_email"]
-
-# if user_email not in ALLOWED_EMAILS:
-#     st.error("❌ You do not have permission to access this tool.")
-#     st.stop()
-
-# # Step 4: Successful login
-# # -------------------------
-# st.success(f"Signed in as {user_email}")
-
-# # Your main app code goes here
-# # -------------------------
-# st.write("Welcome to the Public Partner Search Tool!")
+# -----------------------------
+# Your app content goes here
+# -----------------------------
+st.write("Welcome to the Public Partner Search Tool!")
 
 
 
@@ -630,6 +523,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
