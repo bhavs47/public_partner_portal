@@ -18,45 +18,11 @@ st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
 # 1️⃣ Load secrets safely
 # -----------------------------
-TENANT_ID = st.secrets["TENANT_ID"]
-CLIENT_ID = st.secrets["CLIENT_ID"]
-REDIRECT_URI = st.secrets["REDIRECT_URI"]
-ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
-SCOPE = ["User.Read"]
-
-# --- Initialize MSAL ---
-app = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
-
-# --- Simple login test ---
-def login():
-    auth_url = app.get_authorization_request_url(
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI,
-        state=str(uuid.uuid4())
-    )
-    st.markdown(
-        f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-        f'Sign in with Microsoft</a>',
-        unsafe_allow_html=True
-    )
-
-# --- Test if secrets are loaded ---
-st.write("✅ Secrets loaded successfully:")
-st.write("CLIENT_ID:", CLIENT_ID)
-st.write("REDIRECT_URI:", REDIRECT_URI)
-
-# --- Only show login button ---
-st.title("Test MSAL Login")
-login()
-
-
-
-
-
-
-
-
+# TENANT_ID = st.secrets["TENANT_ID"]
+# CLIENT_ID = st.secrets["CLIENT_ID"]
+# REDIRECT_URI = st.secrets["REDIRECT_URI"]
+# ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
+# SCOPE = ["User.Read"]
 
 # -----------------------------
 # 2️⃣ Initialize MSAL PublicClientApplication
@@ -537,6 +503,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
