@@ -5,4 +5,4 @@ numpy
 msal
 requests
 uuid
-webbrowser
+json
