@@ -23,7 +23,7 @@ SCOPE = ["User.Read"]
 
 app = msal.PublicClientApplication(
     CLIENT_ID,
-    authority=AUTHORITY
+    authority=AUTHORITY,
     client_credential=CLIENT_SECRET
 )
 
@@ -480,6 +480,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
