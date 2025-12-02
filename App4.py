@@ -11,7 +11,7 @@ import streamlit as st
 import msal
 import uuid
 
-# st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
+st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
 # TENANT_ID = "bdeaeda8-c81d-45ce-863e-5232a535b7cb"
 # CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
@@ -478,6 +478,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
