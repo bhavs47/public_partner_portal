@@ -13,64 +13,64 @@ import uuid
 
 st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
-# TENANT_ID = "bdeaeda8-c81d-45ce-863e-5232a535b7cb"
-# CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
+TENANT_ID = "bdeaeda8-c81d-45ce-863e-5232a535b7cb"
+CLIENT_ID = "efc79e54-d1b2-45b9-b220-c2ace0ed90a4"
 
-# AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-# REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
-# SCOPE = ["User.Read"]
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
+SCOPE = ["User.Read"]
 
-# app = msal.PublicClientApplication(
-#     CLIENT_ID,
-#     authority=AUTHORITY
-# )
+app = msal.PublicClientApplication(
+    CLIENT_ID,
+    authority=AUTHORITY
+)
 
-# def login():
-#     auth_url = app.get_authorization_request_url(
-#         scopes=SCOPE,
-#         redirect_uri=REDIRECT_URI,
-#         state=str(uuid.uuid4()),
-#         prompt="select_account",
-#         code_challenge="abcd",
-#         code_challenge_method="plain"
-#     )
-#     st.markdown(
-#         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-#         f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-#         f'Sign in with Microsoft</a>',
-#         unsafe_allow_html=True
-#     )
+def login():
+    auth_url = app.get_authorization_request_url(
+        scopes=SCOPE,
+        redirect_uri=REDIRECT_URI,
+        state=str(uuid.uuid4()),
+        prompt="select_account",
+        code_challenge="abcd",
+        code_challenge_method="plain"
+    )
+    st.markdown(
+        f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
+        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+        f'Sign in with Microsoft</a>',
+        unsafe_allow_html=True
+    )
 
-# query_params = st.experimental_get_query_params()
+query_params = st.experimental_get_query_params()
 
-# if "code" not in query_params:
-#     st.title("🔐 Public Partner Portal Login")
-#     login()
-#     st.stop()
+if "code" not in query_params:
+    st.title("🔐 Public Partner Portal Login")
+    login()
+    st.stop()
 
-# code = query_params["code"][0]
+code = query_params["code"][0]
 
-# token_result = app.acquire_token_by_authorization_code(
-#     code=code,
-#     scopes=SCOPE,
-#     redirect_uri=REDIRECT_URI
-# )
+token_result = app.acquire_token_by_authorization_code(
+    code=code,
+    scopes=SCOPE,
+    redirect_uri=REDIRECT_URI
+)
 
-# if "access_token" not in token_result:
-#     st.error("Authentication failed.")
-#     st.json(token_result)
-#     st.stop()
+if "access_token" not in token_result:
+    st.error("Authentication failed.")
+    st.json(token_result)
+    st.stop()
 
-# email = token_result["id_token_claims"]["preferred_username"]
-# st.session_state["user_email"] = email
+email = token_result["id_token_claims"]["preferred_username"]
+st.session_state["user_email"] = email
 
-# allowed_emails = ["bhavya.nair@nihr.ac.uk"]
+allowed_emails = ["bhavya.nair@nihr.ac.uk"]
 
-# if email not in allowed_emails:
-#     st.error("❌ You do not have permission to access this tool.")
-#     st.stop()
+if email not in allowed_emails:
+    st.error("❌ You do not have permission to access this tool.")
+    st.stop()
 
-# st.success(f"Signed in as {email}")
+st.success(f"Signed in as {email}")
 
 
 # --- Helper functions ---
@@ -478,6 +478,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
