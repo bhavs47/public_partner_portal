@@ -21,10 +21,16 @@ AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "https://publicpartnerselection.streamlit.app/auth"
 SCOPE = ["User.Read"]
 
-app = msal.PublicClientApplication(
+# app = msal.PublicClientApplication(
+#     CLIENT_ID,
+#     authority=AUTHORITY,
+#     client_credential=CLIENT_SECRET
+# )
+
+app = msal.ConfidentialClientApplication(
     CLIENT_ID,
     authority=AUTHORITY,
-    client_credential=CLIENT_SECRET
+    client_credential=CLIENT_SECRET  
 )
 
 def login():
@@ -480,6 +486,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
