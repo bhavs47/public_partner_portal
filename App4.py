@@ -64,12 +64,15 @@ query_params = st.experimental_get_query_params()
 # Step 1: If token not in session, check for code
 if "access_token" not in st.session_state:
     if "code" in query_params:
-        # Verify state parameter
-        if query_params.get("state", [None])[0] != st.session_state.get("auth_state"):
+        # Check if state exists in session
+        saved_state = st.session_state.get("auth_state", None)
+        received_state = query_params.get("state", [None])[0]
+
+        if saved_state is not None and received_state != saved_state:
             st.error("Invalid state. Possible CSRF attack.")
             st.stop()
-
-        # Redeem authorization code
+        
+        # Redeem code
         code = query_params["code"][0]
         token_result = app.acquire_token_by_authorization_code(
             code=code,
@@ -82,11 +85,11 @@ if "access_token" not in st.session_state:
             st.json(token_result)
             st.stop()
 
-        # Store token and user info in session_state
+        # Store token and email
         st.session_state["access_token"] = token_result["access_token"]
         st.session_state["user_email"] = token_result["id_token_claims"].get("preferred_username")
-        
-        # Clean URL to prevent code reuse
+
+        # Clear query params to prevent code reuse
         st.experimental_set_query_params()
     else:
         # Step 2: No token and no code -> show login button
@@ -572,6 +575,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
