@@ -65,16 +65,23 @@ if "code" not in query_params:
 
 code = query_params["code"][0]
 
+# --- Acquire Token ---
+token_result = app.acquire_token_by_authorization_code(
+    code=code,
+    scopes=SCOPE,
+    redirect_uri=REDIRECT_URI
+)
+
 # Acquire token using the authorization code
-try:
-    token_result = app.acquire_token_by_authorization_code(
-        code=code,
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI
-    )
-except Exception as e:
-    st.error(f"Authentication exception: {e}")
-    st.stop()
+# try:
+#     token_result = app.acquire_token_by_authorization_code(
+#         code=code,
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI
+#     )
+# except Exception as e:
+#     st.error(f"Authentication exception: {e}")
+#     st.stop()
 
 # # Check if token was acquired successfully
 if "access_token" not in token_result:
@@ -231,18 +238,29 @@ def sample_dataframe():
 #                     "<small style='color:#2f6fdb'>User ID: <b>02528882307476498717</b></small>"
 #                     "</div>", unsafe_allow_html=True)
 
+# After successful authentication
+claims = token_result.get("id_token_claims", {})
+
+user_email = claims.get("preferred_username", "Unknown")
+user_name = claims.get("name", "Unknown")
+user_id = claims.get("oid") or claims.get("sub") or "Unknown"
+
+# Displaying the app header with user info
 with st.container():
     col1, col2 = st.columns([3,1])
+    
     with col1:
         st.markdown("## PECD Public Partner Search Tool")
         st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
+    
     with col2:
         st.markdown(
-            f"<div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>"
-            f"<small style='color:#2f6fdb'>User ID: <b>{user_id}</b></small>"
-            "</div>",
-            unsafe_allow_html=True
-        )
+            f"""
+            <div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>
+                <small style='color:#2f6fdb'>Name: <b>{user_name}</b></small><br>
+                <small style='color:#2f6fdb'>Email: <b>{user_email}</b></small><br>
+                <small style='color:#2f6fdb'
+
 
 
 st.write("---")
@@ -521,6 +539,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
