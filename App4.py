@@ -21,6 +21,7 @@ st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 # -----------------------------
 TENANT_ID = st.secrets["TENANT_ID"]
 CLIENT_ID = st.secrets["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 REDIRECT_URI = st.secrets["REDIRECT_URI"]
 ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
 SCOPE = ["User.Read"]
@@ -506,6 +507,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
