@@ -88,6 +88,9 @@ if "access_token" not in token_result:
 email = token_result["id_token_claims"].get("preferred_username")
 st.session_state["user_email"] = email
 
+st.write("email?", bool(email))
+st.write("allowed_emails?", bool(ALLOWED_EMAILS))
+
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
@@ -507,6 +510,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
