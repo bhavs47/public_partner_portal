@@ -4,7 +4,8 @@ Public Partner Search Tool - Streamlit app
 Save as app.py and run: streamlit run app.py
 """
 from io import BytesIO
-from msal import PublicClientApplication
+#from msal import PublicClientApplication
+from msal import ConfidentialClientApplication
 import json
 import pandas as pd
 import requests
@@ -30,7 +31,8 @@ SCOPE = ["User.Read"]
 app = PublicClientApplication(
     client_id=CLIENT_ID,
     client_credential=CLIENT_SECRET,
-    authority=f"https://login.microsoftonline.com/{TENANT_ID}"
+    authority=AUTHORITY
+    #authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
 # # -----------------------------
@@ -504,6 +506,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
