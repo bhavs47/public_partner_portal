@@ -29,7 +29,7 @@ SCOPE = ["User.Read"]
 # -----------------------------
 app = PublicClientApplication(
     client_id=CLIENT_ID,
-    client_credential=CLIENT_SECRET
+    client_credential=CLIENT_SECRET,
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
@@ -504,6 +504,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
