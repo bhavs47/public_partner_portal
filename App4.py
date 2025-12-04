@@ -221,15 +221,29 @@ def sample_dataframe():
 
 
 # --- UI Header ---
+# with st.container():
+#     col1, col2 = st.columns([3,1])
+#     with col1:
+#         st.markdown("## PECD Public Partner Search Tool")
+#         st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
+#     with col2:
+#         st.markdown("<div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>"
+#                     "<small style='color:#2f6fdb'>User ID: <b>02528882307476498717</b></small>"
+#                     "</div>", unsafe_allow_html=True)
+
 with st.container():
     col1, col2 = st.columns([3,1])
     with col1:
         st.markdown("## PECD Public Partner Search Tool")
         st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
     with col2:
-        st.markdown("<div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>"
-                    "<small style='color:#2f6fdb'>User ID: <b>02528882307476498717</b></small>"
-                    "</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>"
+            f"<small style='color:#2f6fdb'>User ID: <b>{user_id}</b></small>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+
 
 st.write("---")
 
@@ -507,6 +521,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
