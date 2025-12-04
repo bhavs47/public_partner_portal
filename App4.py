@@ -39,67 +39,117 @@ app = ConfidentialClientApplication(
 # # -----------------------------
 # # 3️⃣ Generate login URL
 # # -----------------------------
-def login():
-    auth_url = app.get_authorization_request_url(
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI,
-        state=str(uuid.uuid4()),  # unique state per request for CSRF protection
-        prompt="select_account"
-    )
-    st.markdown(
-        f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-        f'Sign in with Microsoft</a>',
-        unsafe_allow_html=True
-    )
+# def login():
+#     auth_url = app.get_authorization_request_url(
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI,
+#         state=str(uuid.uuid4()),  # unique state per request for CSRF protection
+#         prompt="select_account"
+#     )
+#     st.markdown(
+#         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
+#         f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+#         f'Sign in with Microsoft</a>',
+#         unsafe_allow_html=True
+#     )
+
+# # # 4️⃣ Handle OAuth2 callback
+# # # -----------------------------
+# query_params = st.experimental_get_query_params()
+
+# if "code" not in query_params:
+#     st.title("🔐 Public Partner Portal Login")
+#     login()
+#     st.stop()
+
+# code = query_params["code"][0]
+
+# # --- Acquire Token ---
+# token_result = app.acquire_token_by_authorization_code(
+#     code=code,
+#     scopes=SCOPE,
+#     redirect_uri=REDIRECT_URI
+# )
+
+
+# # # Check if token was acquired successfully
+# if "access_token" not in token_result:
+#     st.error("❌ Authentication failed.")
+#     st.json(token_result)
+#     st.stop()
 
 # # -----------------------------
-# # 4️⃣ Handle OAuth2 callback
+# # 5️⃣ Verify email access
 # # -----------------------------
+# email = token_result["id_token_claims"].get("preferred_username")
+# st.session_state["user_email"] = email
+
+# if email not in ALLOWED_EMAILS:
+#     st.error("❌ You do not have permission to access this tool.")
+#     st.stop()
+
+#st.success(f"✅ Signed in as {email}")
+
+# -----------------------------
+# 3️⃣ Generate login URL and handle in-page redirect
+# -----------------------------
 query_params = st.experimental_get_query_params()
 
 if "code" not in query_params:
     st.title("🔐 Public Partner Portal Login")
-    login()
-    st.stop()
 
+    if st.button("Sign in with Microsoft"):
+        # Generate the auth URL for Microsoft login
+        auth_url = app.get_authorization_request_url(
+            scopes=SCOPE,
+            redirect_uri=REDIRECT_URI,
+            state=str(uuid.uuid4()),  # unique state per request for CSRF protection
+            prompt="select_account"
+        )
+
+        # Use JS redirect to open the login page in the same tab
+        js_redirect = f"""
+        <script type="text/javascript">
+            window.location.href = "{auth_url}";
+        </script>
+        """
+        st.components.v1.html(js_redirect, height=0)
+
+    st.stop()  # stop the rest of the app until login is completed
+
+# -----------------------------
+# 4️⃣ Handle OAuth2 callback after successful login
+# -----------------------------
 code = query_params["code"][0]
 
-# --- Acquire Token ---
 token_result = app.acquire_token_by_authorization_code(
     code=code,
     scopes=SCOPE,
     redirect_uri=REDIRECT_URI
 )
 
-# Acquire token using the authorization code
-# try:
-#     token_result = app.acquire_token_by_authorization_code(
-#         code=code,
-#         scopes=SCOPE,
-#         redirect_uri=REDIRECT_URI
-#     )
-# except Exception as e:
-#     st.error(f"Authentication exception: {e}")
-#     st.stop()
-
-# # Check if token was acquired successfully
+# Check if token was acquired successfully
 if "access_token" not in token_result:
     st.error("❌ Authentication failed.")
     st.json(token_result)
     st.stop()
 
 # -----------------------------
-# 5️⃣ Verify email access
+# 5️⃣ Extract user info and verify access
 # -----------------------------
-email = token_result["id_token_claims"].get("preferred_username")
-st.session_state["user_email"] = email
+claims = token_result.get("id_token_claims", {})
 
-if email not in ALLOWED_EMAILS:
+user_email = claims.get("preferred_username", "Unknown")
+user_name = claims.get("name", "Unknown")
+
+st.session_state["user_email"] = user_email
+
+if user_email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-#st.success(f"✅ Signed in as {email}")
+
+
 
 
 
@@ -533,6 +583,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
