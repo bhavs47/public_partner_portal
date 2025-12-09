@@ -189,7 +189,7 @@ def filter_dataframe(df, filters):
     if filters['name_search']:
         before = len(d)
         d = d[d[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
-        debug_msgs.append(f"Name search removed {before - len(d)} rows")
+        #debug_msgs.append(f"Name search removed {before - len(d)} rows")
 
     # Expertise search
     if filters['expertise_search'] and filters['expertise_col']:
@@ -511,6 +511,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
