@@ -396,14 +396,9 @@ with btn2:
 
 
 
-# ---------------------------------------------------------
-# PRE-CHECK: CLEAR FILTER BUTTON MUST BE PROCESSED FIRST
-# ---------------------------------------------------------
 
-# Did the user click Clear Filters on the PREVIOUS run?
-if "clear_filters_btn" in st.session_state and st.session_state.clear_filters_btn:
-
-    # Reset filter widget values BEFORE rendering widgets
+# Reset filters if Clear is clicked
+if clear_clicked:
     st.session_state["selected_disease"] = "Any"
     st.session_state["selected_gender"] = "Any"
     st.session_state["min_age_val"] = 0
@@ -414,83 +409,28 @@ if "clear_filters_btn" in st.session_state and st.session_state.clear_filters_bt
     st.session_state["expertise_search"] = ""
     st.session_state["eth_col"] = "Any"
     st.session_state["disease_cols"] = []
-
-    # Turn off the button flag so rerun is clean
-    st.session_state.clear_filters_btn = False
-
-    # Rerun BEFORE widgets are rendered
     st.rerun()
 
-
-# ---------------------------------------------------------
-# VALIDATIONS
-# ---------------------------------------------------------
-if not name_col or not email_col:
-    st.error(
-        "Your uploaded file must include columns for Name and Email (e.g. 'name' and 'email').\n"
-        "Detected columns: " + ", ".join(df.columns)
-    )
-    st.stop()
-
-# ---------------------------------------------------------
-# BUILD OPTION LISTS
-# ---------------------------------------------------------
-all_diseases = set()
-for col in disease_cols:
-    all_diseases.update(df[col].dropna().astype(str).unique())
-
-disease_options = ["Any"] + sorted(all_diseases)
-gender_options = ["Any"] if not gender_col else ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
-carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dropna().astype(str).unique())
-ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
+# --- Clear Filters Button ---
+# if st.button("Clear All Filters", key="clear_filters_btn"):
+#     st.session_state["selected_disease"] = "Any"
+#     st.session_state["selected_gender"] = "Any"
+#     st.session_state["min_age_val"] = 0
+#     st.session_state["max_age_val"] = 120
+#     st.session_state["selected_carer"] = "Any"
+#     st.session_state["name_search"] = ""
+#     st.session_state["expertise_search"] = ""
+#     st.session_state["eth_col"] = "Any"
+#     st.session_state["disease_cols"] = []
+#     st.rerun()  # refresh the app to apply cleared filters
+    
+# st.write("")
+# search_col, export_col = st.columns([1,1])
+# with search_col:
+#     do_search = st.button("🔍 Search Partners")
 
 
-# ---------------------------------------------------------
-# FILTER UI
-# ---------------------------------------------------------
-st.markdown("### Search Filters for Public Partners")
-f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
-
-with f1:
-    selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
-
-with f2:
-    selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
-
-with f3:
-    min_age_val = st.number_input("Min Age", 0, 120, key="min_age_val")
-    max_age_val = st.number_input("Max Age", 0, 120, key="max_age_val")
-
-with f4:
-    selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
-
-with f5:
-    selected_ethnicity = st.selectbox("Ethnicity", ethnicity_options, key="selected_ethnicity")
-
-g1, g2 = st.columns([2,2])
-
-with g1:
-    name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice", key="name_search")
-
-with g2:
-    expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
-
-
-# ---------------------------------------------------------
-# BUTTONS
-# ---------------------------------------------------------
-btn1, btn2 = st.columns([1,1])
-
-with btn1:
-    st.button("🧹 Clear All Filters", key="clear_filters_btn")
-
-with btn2:
-    do_search = st.button("🔍 Search Partners")
-
-
-# ---------------------------------------------------------
-# BUILD FILTER DICTIONARY
-# ---------------------------------------------------------
+# --- Build filters dict ---
 filters = {
     'disease_area': selected_disease,
     'disease_cols': disease_cols,
@@ -503,6 +443,9 @@ filters = {
 
     'ethnicity': selected_ethnicity,
     'ethnicity_col': ethnicity_col,
+    
+    #'ethnicity': eth_col,
+    #'ethnicity_col': ethnicity_col,
 
     'min_age': min_age_val,
     'max_age': max_age_val,
@@ -516,16 +459,21 @@ filters = {
 }
 
 
-# ---------------------------------------------------------
-# FILTER RESULTS
-# ---------------------------------------------------------
+
+
+# --- Filter ---
 results = filter_dataframe(df, filters)
-display_df = results
 
 
-# ---------------------------------------------------------
-# SHOW RESULTS
-# ---------------------------------------------------------
+# --- Display table ---
+display_df = results  # show all columns
+#display_cols = [name_col, email_col]
+#for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
+    #if c and c not in display_cols:
+        #display_cols.append(c)
+
+#display_df = results[display_cols]
+
 st.write("---")
 res1, res2 = st.columns([1,3])
 
@@ -537,6 +485,7 @@ with res2:
         csv = display_df.to_csv(index=False).encode('utf-8')
         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
 
+        # --- Two buttons side by side ---
         col1, col2 = st.columns(2)
 
         with col1:
@@ -556,145 +505,19 @@ with res2:
                 mime="application/json",
                 use_container_width=True
             )
+
     else:
         st.info("No results match your filters.")
 
+with res2:
+    if len(display_df) > 0:
+        csv = display_df.to_csv(index=False).encode('utf-8')
+        json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Reset filters if Clear is clicked
-# if clear_clicked:
-#     st.session_state["selected_disease"] = "Any"
-#     st.session_state["selected_gender"] = "Any"
-#     st.session_state["min_age_val"] = 0
-#     st.session_state["max_age_val"] = 120
-#     st.session_state["selected_carer"] = "Any"
-#     st.session_state["selected_ethnicity"] = "Any"
-#     st.session_state["name_search"] = ""
-#     st.session_state["expertise_search"] = ""
-#     st.session_state["eth_col"] = "Any"
-#     st.session_state["disease_cols"] = []
-#     st.rerun()
-
-# # --- Clear Filters Button ---
-# # if st.button("Clear All Filters", key="clear_filters_btn"):
-# #     st.session_state["selected_disease"] = "Any"
-# #     st.session_state["selected_gender"] = "Any"
-# #     st.session_state["min_age_val"] = 0
-# #     st.session_state["max_age_val"] = 120
-# #     st.session_state["selected_carer"] = "Any"
-# #     st.session_state["name_search"] = ""
-# #     st.session_state["expertise_search"] = ""
-# #     st.session_state["eth_col"] = "Any"
-# #     st.session_state["disease_cols"] = []
-# #     st.rerun()  # refresh the app to apply cleared filters
-    
-# # st.write("")
-# # search_col, export_col = st.columns([1,1])
-# # with search_col:
-# #     do_search = st.button("🔍 Search Partners")
-
-
-# # --- Build filters dict ---
-# filters = {
-#     'disease_area': selected_disease,
-#     'disease_cols': disease_cols,
-
-#     'gender': selected_gender,
-#     'gender_col': gender_col,
-
-#     'carer': selected_carer,
-#     'carer_col': carer_col,
-
-#     'ethnicity': selected_ethnicity,
-#     'ethnicity_col': ethnicity_col,
-    
-#     #'ethnicity': eth_col,
-#     #'ethnicity_col': ethnicity_col,
-
-#     'min_age': min_age_val,
-#     'max_age': max_age_val,
-#     'age_col': age_col,
-
-#     'name_search': name_search.strip() if name_search else "",
-#     'name_col': name_col,
-
-#     'expertise_search': expertise_search.strip() if expertise_search else "",
-#     'expertise_col': expertise_col
-# }
-
-
-
-
-# # --- Filter ---
-# results = filter_dataframe(df, filters)
-
-
-# # --- Display table ---
-# display_df = results  # show all columns
-# #display_cols = [name_col, email_col]
-# #for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
-#     #if c and c not in display_cols:
-#         #display_cols.append(c)
-
-# #display_df = results[display_cols]
-
-# st.write("---")
-# res1, res2 = st.columns([1,3])
-
-# with res1:
-#     st.markdown(f"**Search Results ({len(display_df)})**")
-
-# with res2:
-#     if len(display_df) > 0:
-#         csv = display_df.to_csv(index=False).encode('utf-8')
-#         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
-
-#         # --- Two buttons side by side ---
-#         col1, col2 = st.columns(2)
-
-#         with col1:
-#             st.download_button(
-#                 "Export CSV",
-#                 data=csv,
-#                 file_name="filtered_participants.csv",
-#                 mime="text/csv",
-#                 use_container_width=True
-#             )
-
-#         with col2:
-#             st.download_button(
-#                 "Export JSON",
-#                 data=json_bytes,
-#                 file_name="filtered_participants.json",
-#                 mime="application/json",
-#                 use_container_width=True
-#             )
-
-#     else:
-#         st.info("No results match your filters.")
-
-# with res2:
-#     if len(display_df) > 0:
-#         csv = display_df.to_csv(index=False).encode('utf-8')
-#         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
-
-#         st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv")
-#         st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json")
-#     else:
-#         st.info("No results match your filters.")
+        st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv")
+        st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json")
+    else:
+        st.info("No results match your filters.")
 
 #st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
 st.dataframe(display_df, use_container_width=True, hide_index=True)
@@ -708,6 +531,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
