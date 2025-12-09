@@ -533,6 +533,7 @@ with res2:
         st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv")
         st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json")
     else:
+        #st.info("No results match your filters.")
         st.info("No results match your filters.")
 
 #st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
@@ -547,6 +548,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
