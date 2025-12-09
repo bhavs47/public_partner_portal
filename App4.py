@@ -392,11 +392,18 @@ with btn2:
 
 
 
-# --- CLEAR FILTERS HANDLER (must run BEFORE widgets render!) ---
-clear_clicked = st.session_state.get("clear_filters_btn", False)
 
-if clear_clicked:
-    # Reset all widget keys BEFORE widgets render
+
+
+
+# ---------------------------------------------------------
+# PRE-CHECK: CLEAR FILTER BUTTON MUST BE PROCESSED FIRST
+# ---------------------------------------------------------
+
+# Did the user click Clear Filters on the PREVIOUS run?
+if "clear_filters_btn" in st.session_state and st.session_state.clear_filters_btn:
+
+    # Reset filter widget values BEFORE rendering widgets
     st.session_state["selected_disease"] = "Any"
     st.session_state["selected_gender"] = "Any"
     st.session_state["min_age_val"] = 0
@@ -406,22 +413,28 @@ if clear_clicked:
     st.session_state["name_search"] = ""
     st.session_state["expertise_search"] = ""
     st.session_state["eth_col"] = "Any"
-
-    # These two might not be widgets, but resetting is safe
     st.session_state["disease_cols"] = []
 
-    # Rerun AFTER resetting values
-    st.session_state["clear_filters_btn"] = False
+    # Turn off the button flag so rerun is clean
+    st.session_state.clear_filters_btn = False
+
+    # Rerun BEFORE widgets are rendered
     st.rerun()
 
 
-# Ensure required columns exist (at least name & email)
+# ---------------------------------------------------------
+# VALIDATIONS
+# ---------------------------------------------------------
 if not name_col or not email_col:
-    st.error("Your uploaded file must include columns for Name and Email (e.g. 'name' and 'email').\n"
-             "Detected columns: " + ", ".join(df.columns))
+    st.error(
+        "Your uploaded file must include columns for Name and Email (e.g. 'name' and 'email').\n"
+        "Detected columns: " + ", ".join(df.columns)
+    )
     st.stop()
 
-# --- Build disease options across all selected columns ---
+# ---------------------------------------------------------
+# BUILD OPTION LISTS
+# ---------------------------------------------------------
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
@@ -432,40 +445,52 @@ carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dro
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
 
 
-# --- Filters UI ---
+# ---------------------------------------------------------
+# FILTER UI
+# ---------------------------------------------------------
 st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
 with f1:
     selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
+
 with f2:
     selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
+
 with f3:
-    min_age_val = st.number_input("Min Age", min_value=0, max_value=120, key="min_age_val")
-    max_age_val = st.number_input("Max Age", min_value=0, max_value=120, key="max_age_val")
+    min_age_val = st.number_input("Min Age", 0, 120, key="min_age_val")
+    max_age_val = st.number_input("Max Age", 0, 120, key="max_age_val")
+
 with f4:
     selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
+
 with f5:
     selected_ethnicity = st.selectbox("Ethnicity", ethnicity_options, key="selected_ethnicity")
 
 g1, g2 = st.columns([2,2])
+
 with g1:
     name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice", key="name_search")
+
 with g2:
     expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
 
-# --- Clear + Search Buttons Side by Side ---
+# ---------------------------------------------------------
+# BUTTONS
+# ---------------------------------------------------------
 btn1, btn2 = st.columns([1,1])
 
 with btn1:
-    st.button("🧹 Clear All Filters", key="clear_filters_btn")   # NO logic here
+    st.button("🧹 Clear All Filters", key="clear_filters_btn")
 
 with btn2:
     do_search = st.button("🔍 Search Partners")
 
 
-# --- Build filters dict ---
+# ---------------------------------------------------------
+# BUILD FILTER DICTIONARY
+# ---------------------------------------------------------
 filters = {
     'disease_area': selected_disease,
     'disease_cols': disease_cols,
@@ -490,13 +515,17 @@ filters = {
     'expertise_col': expertise_col
 }
 
-# --- Filter ---
+
+# ---------------------------------------------------------
+# FILTER RESULTS
+# ---------------------------------------------------------
 results = filter_dataframe(df, filters)
-
-
-# --- Display table ---
 display_df = results
 
+
+# ---------------------------------------------------------
+# SHOW RESULTS
+# ---------------------------------------------------------
 st.write("---")
 res1, res2 = st.columns([1,3])
 
@@ -529,6 +558,7 @@ with res2:
             )
     else:
         st.info("No results match your filters.")
+
 
 
 
@@ -678,6 +708,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
