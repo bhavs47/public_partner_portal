@@ -1,4 +1,4 @@
-# app3.py
+# app4.py
 """
 Public Partner Search Tool - Streamlit app
 Save as app.py and run: streamlit run app.py
@@ -90,20 +90,6 @@ st.session_state["user_email"] = email
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
-
-# st.success(f"✅ Signed in as {email}")
-
-
-
-
-
-
-
-
-
-
-
-
 
 # --- Helper functions ---
 @st.cache_data
@@ -276,12 +262,6 @@ except ValueError as e:
 # Adjust the index to start from 1 instead of 0
 df.index = df.index + 1
     
-# --- Upload section ---
-#st.markdown("### Manage Data / Upload")
-#u_col1, u_col2 = st.columns([3,1])
-#with u_col1:
-    #uploaded_file = st.file_uploader("Upload participants file (Excel .xlsx/.xls or .csv)", type=["xlsx","xls","csv"])
-
 def load_dataframe_from_github(url):
     try:
         response = requests.get(url)
@@ -300,13 +280,6 @@ df = load_dataframe_from_github(dataset_url)
 if df is None:
     st.stop()  # stop the app if loading failed
 
-
-# Load file or sample
-#df = load_dataframe(uploaded_file)
-#if df is None:
-    #st.warning("No file uploaded — using a sample dataset for demo.")
-    #df = sample_dataframe()
-
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
@@ -319,7 +292,6 @@ disease_cols = [
     "5th Disease Experience"
 ]
 
-#disease_cols = [col for col in disease_cols if col in df.columns]
 disease_cols = [col for col in df.columns if "Disease Experience" in col]
 
 # Guess columns (common names)
@@ -377,27 +349,17 @@ with g1:
 with g2:
     expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
 
-#eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
-
 # --- Clear + Search Buttons Side by Side ---
 btn1, btn2 = st.columns([1,1])
 
-with btn1:
-    clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
+# with btn1:
+#     clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
 
 with btn2:
     do_search = st.button("🔍 Search Partners")
 
 
-
-
-
-
-
-
-
-
-# # Reset filters if Clear is clicked
+# Reset filters if Clear is clicked
 # if clear_clicked:
 #     st.session_state["filter_selected_disease"] = "Any"
 #     st.session_state["filter_selected_gender"] = "Any"
@@ -411,18 +373,18 @@ with btn2:
 #     st.rerun()
 
 
-if clear_clicked:
-    st.session_state["selected_disease"] = "Any"
-    st.session_state["selected_gender"] = "Any"
-    st.session_state["min_age_val"] = 0
-    st.session_state["max_age_val"] = 120
-    st.session_state["selected_carer"] = "Any"
-    st.session_state["selected_ethnicity"] = "Any"
-    st.session_state["name_search"] = ""
-    st.session_state["expertise_search"] = ""
-    # st.session_state["eth_col"] = "Any"
-    st.session_state["disease_cols"] = []
-    st.rerun()
+# if clear_clicked:
+#     st.session_state["selected_disease"] = "Any"
+#     st.session_state["selected_gender"] = "Any"
+#     st.session_state["min_age_val"] = 0
+#     st.session_state["max_age_val"] = 120
+#     st.session_state["selected_carer"] = "Any"
+#     st.session_state["selected_ethnicity"] = "Any"
+#     st.session_state["name_search"] = ""
+#     st.session_state["expertise_search"] = ""
+#     # st.session_state["eth_col"] = "Any"
+#     st.session_state["disease_cols"] = []
+#     st.rerun()
 
 # --- Clear Filters Button ---
 # if st.button("Clear All Filters", key="clear_filters_btn"):
@@ -544,6 +506,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
