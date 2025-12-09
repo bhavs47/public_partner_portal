@@ -316,6 +316,9 @@ if not name_col or not email_col:
     st.stop()
 
 
+# ------------------------------------------
+# 1. Build filter option lists
+# ------------------------------------------
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
@@ -327,82 +330,85 @@ carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dro
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
 
 
-# --- Filters UI ---
+# ------------------------------------------
+# 2. Filter defaults (MASTER DEFINITION)
+# ------------------------------------------
+DEFAULT_FILTERS = {
+    "filter_selected_disease": "Any",
+    "filter_selected_gender": "Any",
+    "filter_min_age": 0,
+    "filter_max_age": 120,
+    "filter_selected_carer": "Any",
+    "filter_selected_ethnicity": "Any",
+    "filter_name_search": "",
+    "filter_expertise_search": "",
+}
+
+# Initialize missing keys only
+for k, v in DEFAULT_FILTERS.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
+
+
+# ------------------------------------------
+# 3. UI Widgets (now using consistent keys)
+# ------------------------------------------
 st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
 with f1:
-    selected_disease = st.selectbox("Health Condition", disease_options, key="filter_selected_disease")
+    selected_disease = st.selectbox(
+        "Health Condition", disease_options, key="filter_selected_disease"
+    )
 with f2:
-    selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
+    selected_gender = st.selectbox(
+        "Gender", gender_options, key="filter_selected_gender"
+    )
 with f3:
-    min_age_val = st.number_input("Min Age", min_value=0, max_value=120, key="min_age_val")
-    max_age_val = st.number_input("Max Age", min_value=0, max_value=120, key="max_age_val")
+    min_age_val = st.number_input(
+        "Min Age", min_value=0, max_value=120, key="filter_min_age"
+    )
+    max_age_val = st.number_input(
+        "Max Age", min_value=0, max_value=120, key="filter_max_age"
+    )
 with f4:
-    selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
+    selected_carer = st.selectbox(
+        "Carer", carer_options, key="filter_selected_carer"
+    )
 with f5:
-    selected_ethnicity = st.selectbox("Ethnicity", ethnicity_options, key="selected_ethnicity")
+    selected_ethnicity = st.selectbox(
+        "Ethnicity", ethnicity_options, key="filter_selected_ethnicity"
+    )
 
 g1, g2 = st.columns([2,2])
 with g1:
-    name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice", key="name_search")
+    name_search = st.text_input(
+        "Partner Name Search", placeholder="e.g. Alice", key="filter_name_search"
+    )
 with g2:
-    expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
+    expertise_search = st.text_input(
+        "Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search"
+    )
 
-# --- Clear + Search Buttons Side by Side ---
+
+# ------------------------------------------
+# 4. Buttons
+# ------------------------------------------
 btn1, btn2 = st.columns([1,1])
 
 with btn1:
-    clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
+    clear_clicked = st.button("🧹 Clear All Filters")
 
 with btn2:
     do_search = st.button("🔍 Search Partners")
 
 
-# Reset filters if Clear is clicked
+# ------------------------------------------
+# 5. Clear All Filters (correct fix)
+# ------------------------------------------
 if clear_clicked:
-    st.session_state.update(["filter_selected_disease"] = "Any")
-    # st.session_state["filter_selected_gender"] = "Any"
-    # st.session_state["filter_min_age"] = 0
-    # st.session_state["filter_max_age"] = 120
-    # st.session_state["filter_selected_carer"] = "Any"
-    # st.session_state["filter_selected_ethnicity"] = "Any"
-    # st.session_state["filter_name_search"] = ""
-    # st.session_state["filter_expertise_search"] = ""
-    # st.session_state["disease_cols"] = []   # this is fine if still used
+    st.session_state.update(DEFAULT_FILTERS)
     st.rerun()
-
-
-# if clear_clicked:
-#     st.session_state["selected_disease"] = "Any"
-#     st.session_state["selected_gender"] = "Any"
-#     st.session_state["min_age_val"] = 0
-#     st.session_state["max_age_val"] = 120
-#     st.session_state["selected_carer"] = "Any"
-#     st.session_state["selected_ethnicity"] = "Any"
-#     st.session_state["name_search"] = ""
-#     st.session_state["expertise_search"] = ""
-#     # st.session_state["eth_col"] = "Any"
-#     st.session_state["disease_cols"] = []
-#     st.rerun()
-
-#--- Clear Filters Button ---
-# if st.button("Clear All Filters", key="clear_filters_btn"):
-#     st.session_state["selected_disease"] = "Any"
-#     st.session_state["selected_gender"] = "Any"
-#     st.session_state["min_age_val"] = 0
-#     st.session_state["max_age_val"] = 120
-#     st.session_state["selected_carer"] = "Any"
-#     st.session_state["name_search"] = ""
-#     st.session_state["expertise_search"] = ""
-#     st.session_state["eth_col"] = "Any"
-#     st.session_state["disease_cols"] = []
-#     st.rerun()  # refresh the app to apply cleared filters
-    
-# st.write("")
-# search_col, export_col = st.columns([1,1])
-# with search_col:
-#     do_search = st.button("🔍 Search Partners")
 
 
 # --- Build filters dict ---
