@@ -349,6 +349,12 @@ for k, v in DEFAULT_FILTERS.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
+# ------------------------------------------
+# Reset function for Clear button
+# ------------------------------------------
+def reset_filters():
+    for k, v in DEFAULT_FILTERS.items():
+        st.session_state[k] = v
 
 # ------------------------------------------
 # 3. UI Widgets (now using consistent keys)
@@ -397,18 +403,11 @@ with g2:
 btn1, btn2 = st.columns([1,1])
 
 with btn1:
-    clear_clicked = st.button("🧹 Clear All Filters")
+    clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters)
 
 with btn2:
     do_search = st.button("🔍 Search Partners")
 
-
-# ------------------------------------------
-# 5. Clear All Filters (correct fix)
-# ------------------------------------------
-if clear_clicked:
-    st.session_state.update(DEFAULT_FILTERS)
-    st.rerun()
 
 
 # --- Build filters dict ---
@@ -512,6 +511,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
