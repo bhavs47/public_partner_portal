@@ -191,11 +191,6 @@ def filter_dataframe(df, filters):
         d = d[d[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
         #debug_msgs.append(f"Name search removed {before - len(d)} rows")
 
-    # Expertise search
-    if filters['expertise_search'] and filters['expertise_col']:
-        before = len(d)
-        d = d[d[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
-
     return d
 
 
@@ -306,8 +301,6 @@ gender_col = get_col(df, col_map, ['what is your sex?'])
 transgender_col = get_col(df, col_map, ['do you identify as trans?'])
 sexualorientation_col = get_col(df, col_map, ['which of the following best describes your sexual orientation?'])
 carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
-expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
-
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -386,16 +379,11 @@ with f5:
         "Ethnicity", ethnicity_options, key="filter_selected_ethnicity"
     )
 
-g1, g2 = st.columns([2,2])
+g1, btn1, btn2 = st.columns([2,1,1])
 with g1:
     name_search = st.text_input(
         "Partner Name Search", placeholder="e.g. Alice", key="filter_name_search"
     )
-with g2:
-    expertise_search = st.text_input(
-        "Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search"
-    )
-
 
 # ------------------------------------------
 # 4. Buttons
@@ -433,9 +421,6 @@ filters = {
 
     'name_search': name_search.strip() if name_search else "",
     'name_col': name_col,
-
-    'expertise_search': expertise_search.strip() if expertise_search else "",
-    'expertise_col': expertise_col
 }
 
 
@@ -446,13 +431,7 @@ results = filter_dataframe(df, filters)
 
 
 # --- Display table ---
-display_df = results  # show all columns
-#display_cols = [name_col, email_col]
-#for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
-    #if c and c not in display_cols:
-        #display_cols.append(c)
-
-#display_df = results[display_cols]
+display_df = results  
 
 st.write("---")
 res1, res2 = st.columns([1,3])
@@ -511,6 +490,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
