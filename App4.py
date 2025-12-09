@@ -332,7 +332,7 @@ st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
 with f1:
-    selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
+    selected_disease = st.selectbox("Health Condition", disease_options, key="filter_selected_disease")
 with f2:
     selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
 with f3:
@@ -360,17 +360,17 @@ with btn2:
 
 
 # Reset filters if Clear is clicked
-# if clear_clicked:
-#     st.session_state["filter_selected_disease"] = "Any"
-#     st.session_state["filter_selected_gender"] = "Any"
-#     st.session_state["filter_min_age"] = 0
-#     st.session_state["filter_max_age"] = 120
-#     st.session_state["filter_selected_carer"] = "Any"
-#     st.session_state["filter_selected_ethnicity"] = "Any"
-#     st.session_state["filter_name_search"] = ""
-#     st.session_state["filter_expertise_search"] = ""
-#     st.session_state["disease_cols"] = []   # this is fine if still used
-#     st.rerun()
+if clear_clicked:
+    st.session_state["filter_selected_disease"] = "Any"
+    st.session_state["filter_selected_gender"] = "Any"
+    st.session_state["filter_min_age"] = 0
+    st.session_state["filter_max_age"] = 120
+    st.session_state["filter_selected_carer"] = "Any"
+    st.session_state["filter_selected_ethnicity"] = "Any"
+    st.session_state["filter_name_search"] = ""
+    st.session_state["filter_expertise_search"] = ""
+    st.session_state["disease_cols"] = []   # this is fine if still used
+    st.rerun()
 
 
 # if clear_clicked:
@@ -387,17 +387,17 @@ with btn2:
 #     st.rerun()
 
 #--- Clear Filters Button ---
-if st.button("Clear All Filters", key="clear_filters_btn"):
-    st.session_state["selected_disease"] = "Any"
-    st.session_state["selected_gender"] = "Any"
-    st.session_state["min_age_val"] = 0
-    st.session_state["max_age_val"] = 120
-    st.session_state["selected_carer"] = "Any"
-    st.session_state["name_search"] = ""
-    st.session_state["expertise_search"] = ""
-    st.session_state["eth_col"] = "Any"
-    st.session_state["disease_cols"] = []
-    st.rerun()  # refresh the app to apply cleared filters
+# if st.button("Clear All Filters", key="clear_filters_btn"):
+#     st.session_state["selected_disease"] = "Any"
+#     st.session_state["selected_gender"] = "Any"
+#     st.session_state["min_age_val"] = 0
+#     st.session_state["max_age_val"] = 120
+#     st.session_state["selected_carer"] = "Any"
+#     st.session_state["name_search"] = ""
+#     st.session_state["expertise_search"] = ""
+#     st.session_state["eth_col"] = "Any"
+#     st.session_state["disease_cols"] = []
+#     st.rerun()  # refresh the app to apply cleared filters
     
 # st.write("")
 # search_col, export_col = st.columns([1,1])
@@ -506,6 +506,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
