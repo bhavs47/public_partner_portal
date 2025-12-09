@@ -352,8 +352,8 @@ with g2:
 # --- Clear + Search Buttons Side by Side ---
 btn1, btn2 = st.columns([1,1])
 
-# with btn1:
-#     clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
+with btn1:
+    clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
 
 with btn2:
     do_search = st.button("🔍 Search Partners")
@@ -506,6 +506,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
