@@ -388,7 +388,6 @@ with g1:
 # ------------------------------------------
 # 4. Buttons
 # ------------------------------------------
-btn1, btn2 = st.columns([1,1])
 
 with btn1:
     clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters)
@@ -490,6 +489,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
