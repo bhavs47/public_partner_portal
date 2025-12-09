@@ -390,10 +390,10 @@ with g1:
 # ------------------------------------------
 
 with btn1:
-    clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters)
+    clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
 with btn2:
-    do_search = st.button("🔍 Search Partners")
+    do_search = st.button("🔍 Search Partners", use_container_width=True)
 
 
 
@@ -489,6 +489,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
