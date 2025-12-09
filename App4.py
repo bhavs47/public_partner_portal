@@ -361,15 +361,15 @@ with btn2:
 
 # Reset filters if Clear is clicked
 if clear_clicked:
-    st.session_state["filter_selected_disease"] = "Any"
-    st.session_state["filter_selected_gender"] = "Any"
-    st.session_state["filter_min_age"] = 0
-    st.session_state["filter_max_age"] = 120
-    st.session_state["filter_selected_carer"] = "Any"
-    st.session_state["filter_selected_ethnicity"] = "Any"
-    st.session_state["filter_name_search"] = ""
-    st.session_state["filter_expertise_search"] = ""
-    st.session_state["disease_cols"] = []   # this is fine if still used
+    st.session_state.update(["filter_selected_disease"] = "Any")
+    # st.session_state["filter_selected_gender"] = "Any"
+    # st.session_state["filter_min_age"] = 0
+    # st.session_state["filter_max_age"] = 120
+    # st.session_state["filter_selected_carer"] = "Any"
+    # st.session_state["filter_selected_ethnicity"] = "Any"
+    # st.session_state["filter_name_search"] = ""
+    # st.session_state["filter_expertise_search"] = ""
+    # st.session_state["disease_cols"] = []   # this is fine if still used
     st.rerun()
 
 
@@ -506,6 +506,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
