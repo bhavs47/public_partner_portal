@@ -390,11 +390,11 @@ with g1:
 # ------------------------------------------
 
 with btn1:
-    st.markdown("<div style='margin-top:26px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
     clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
 with btn2:
-    st.markdown("<div style='margin-top:26px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
     do_search = st.button("🔍 Search Partners", use_container_width=True)
 
 
@@ -491,6 +491,7 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
 
 
 
