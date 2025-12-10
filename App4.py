@@ -4,7 +4,6 @@ Public Partner Search Tool - Streamlit app
 Save as app.py and run: streamlit run app.py
 """
 from io import BytesIO
-#from msal import PublicClientApplication
 from msal import ConfidentialClientApplication
 import json
 import pandas as pd
@@ -189,8 +188,7 @@ def filter_dataframe(df, filters):
     if filters['name_search']:
         before = len(d)
         d = d[d[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
-        #debug_msgs.append(f"Name search removed {before - len(d)} rows")
-
+        
     return d
 
 
@@ -469,17 +467,6 @@ with res2:
     else:
         st.info("No results match your filters.")
 
-# with res2:
-#     if len(display_df) > 0:
-#         csv = display_df.to_csv(index=False).encode('utf-8')
-#         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
-
-#         st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv")
-#         st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json")
-#     else:
-#         st.info("No results match your filters.")
-        
-#st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
 st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 
@@ -491,7 +478,6 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
-
 
 
 
