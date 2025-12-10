@@ -1,10 +1,9 @@
-# app5.py
+# app4.py
 """
 Public Partner Search Tool - Streamlit app
 Save as app.py and run: streamlit run app.py
 """
 from io import BytesIO
-#from msal import PublicClientApplication
 from msal import ConfidentialClientApplication
 import json
 import pandas as pd
@@ -90,20 +89,6 @@ st.session_state["user_email"] = email
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
-
-# st.success(f"✅ Signed in as {email}")
-
-
-
-
-
-
-
-
-
-
-
-
 
 # --- Helper functions ---
 @st.cache_data
@@ -203,13 +188,7 @@ def filter_dataframe(df, filters):
     if filters['name_search']:
         before = len(d)
         d = d[d[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
-        debug_msgs.append(f"Name search removed {before - len(d)} rows")
-
-    # Expertise search
-    if filters['expertise_search'] and filters['expertise_col']:
-        before = len(d)
-        d = d[d[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
-
+        
     return d
 
 
@@ -276,12 +255,6 @@ except ValueError as e:
 # Adjust the index to start from 1 instead of 0
 df.index = df.index + 1
     
-# --- Upload section ---
-#st.markdown("### Manage Data / Upload")
-#u_col1, u_col2 = st.columns([3,1])
-#with u_col1:
-    #uploaded_file = st.file_uploader("Upload participants file (Excel .xlsx/.xls or .csv)", type=["xlsx","xls","csv"])
-
 def load_dataframe_from_github(url):
     try:
         response = requests.get(url)
@@ -300,13 +273,6 @@ df = load_dataframe_from_github(dataset_url)
 if df is None:
     st.stop()  # stop the app if loading failed
 
-
-# Load file or sample
-#df = load_dataframe(uploaded_file)
-#if df is None:
-    #st.warning("No file uploaded — using a sample dataset for demo.")
-    #df = sample_dataframe()
-
 # normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
@@ -319,7 +285,6 @@ disease_cols = [
     "5th Disease Experience"
 ]
 
-#disease_cols = [col for col in disease_cols if col in df.columns]
 disease_cols = [col for col in df.columns if "Disease Experience" in col]
 
 # Guess columns (common names)
@@ -334,8 +299,6 @@ gender_col = get_col(df, col_map, ['what is your sex?'])
 transgender_col = get_col(df, col_map, ['do you identify as trans?'])
 sexualorientation_col = get_col(df, col_map, ['which of the following best describes your sexual orientation?'])
 carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
-expertise_col = get_col(df, col_map, ['expertise', 'keywords', 'areas_of_expertise', 'notes'])
-
     
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -344,6 +307,9 @@ if not name_col or not email_col:
     st.stop()
 
 
+# ------------------------------------------
+# 1. Build filter option lists
+# ------------------------------------------
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
@@ -355,92 +321,80 @@ carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dro
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
 
 
-# --- Filters UI ---
+# ------------------------------------------
+# 2. Filter defaults (MASTER DEFINITION)
+# ------------------------------------------
+DEFAULT_FILTERS = {
+    "filter_selected_disease": "Any",
+    "filter_selected_gender": "Any",
+    "filter_min_age": 0,
+    "filter_max_age": 120,
+    "filter_selected_carer": "Any",
+    "filter_selected_ethnicity": "Any",
+    "filter_name_search": "",
+    "filter_expertise_search": "",
+}
+
+# Initialize missing keys only
+for k, v in DEFAULT_FILTERS.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
+
+# ------------------------------------------
+# Reset function for Clear button
+# ------------------------------------------
+def reset_filters():
+    for k, v in DEFAULT_FILTERS.items():
+        st.session_state[k] = v
+
+# ------------------------------------------
+# 3. UI Widgets (now using consistent keys)
+# ------------------------------------------
 st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
 
 with f1:
-    selected_disease = st.selectbox("Health Condition", disease_options, key="selected_disease")
+    selected_disease = st.selectbox(
+        "Health Condition", disease_options, key="filter_selected_disease"
+    )
 with f2:
-    selected_gender = st.selectbox("Gender", gender_options, key="selected_gender")
+    selected_gender = st.selectbox(
+        "Gender", gender_options, key="filter_selected_gender"
+    )
 with f3:
-    min_age_val = st.number_input("Min Age", min_value=0, max_value=120, key="min_age_val")
-    max_age_val = st.number_input("Max Age", min_value=0, max_value=120, key="max_age_val")
+    min_age_val = st.number_input(
+        "Min Age", min_value=0, max_value=120, key="filter_min_age"
+    )
+    max_age_val = st.number_input(
+        "Max Age", min_value=0, max_value=120, key="filter_max_age"
+    )
 with f4:
-    selected_carer = st.selectbox("Carer", carer_options, key="selected_carer")
+    selected_carer = st.selectbox(
+        "Carer", carer_options, key="filter_selected_carer"
+    )
 with f5:
-    selected_ethnicity = st.selectbox("Ethnicity", ethnicity_options, key="selected_ethnicity")
+    selected_ethnicity = st.selectbox(
+        "Ethnicity", ethnicity_options, key="filter_selected_ethnicity"
+    )
 
-g1, g2 = st.columns([2,2])
+g1, btn1, btn2 = st.columns([2,1,1])
 with g1:
-    name_search = st.text_input("Partner Name Search", placeholder="e.g. Alice", key="name_search")
-with g2:
-    expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="expertise_search")
+    name_search = st.text_input(
+        "Partner Name Search", placeholder="e.g. Alice", key="filter_name_search"
+    )
 
-#eth_col = st.selectbox("Ethnicity", ethnicity_options, key="eth_col")
-
-# --- Clear + Search Buttons Side by Side ---
-btn1, btn2 = st.columns([1,1])
+# ------------------------------------------
+# 4. Buttons
+# ------------------------------------------
 
 with btn1:
-    clear_clicked = st.button("🧹 Clear All Filters", key="clear_filters_btn")
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
+    clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
 with btn2:
-    do_search = st.button("🔍 Search Partners")
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
+    do_search = st.button("🔍 Search Partners", use_container_width=True)
 
-
-
-
-
-
-
-
-
-
-# # Reset filters if Clear is clicked
-# if clear_clicked:
-#     st.session_state["filter_selected_disease"] = "Any"
-#     st.session_state["filter_selected_gender"] = "Any"
-#     st.session_state["filter_min_age"] = 0
-#     st.session_state["filter_max_age"] = 120
-#     st.session_state["filter_selected_carer"] = "Any"
-#     st.session_state["filter_selected_ethnicity"] = "Any"
-#     st.session_state["filter_name_search"] = ""
-#     st.session_state["filter_expertise_search"] = ""
-#     st.session_state["disease_cols"] = []   # this is fine if still used
-#     st.rerun()
-
-
-if clear_clicked:
-    st.session_state["selected_disease"] = "Any"
-    st.session_state["selected_gender"] = "Any"
-    st.session_state["min_age_val"] = 0
-    st.session_state["max_age_val"] = 120
-    st.session_state["selected_carer"] = "Any"
-    st.session_state["selected_ethnicity"] = "Any"
-    st.session_state["name_search"] = ""
-    st.session_state["expertise_search"] = ""
-    # st.session_state["eth_col"] = "Any"
-    st.session_state["disease_cols"] = []
-    st.rerun()
-
-# --- Clear Filters Button ---
-# if st.button("Clear All Filters", key="clear_filters_btn"):
-#     st.session_state["selected_disease"] = "Any"
-#     st.session_state["selected_gender"] = "Any"
-#     st.session_state["min_age_val"] = 0
-#     st.session_state["max_age_val"] = 120
-#     st.session_state["selected_carer"] = "Any"
-#     st.session_state["name_search"] = ""
-#     st.session_state["expertise_search"] = ""
-#     st.session_state["eth_col"] = "Any"
-#     st.session_state["disease_cols"] = []
-#     st.rerun()  # refresh the app to apply cleared filters
-    
-# st.write("")
-# search_col, export_col = st.columns([1,1])
-# with search_col:
-#     do_search = st.button("🔍 Search Partners")
 
 
 # --- Build filters dict ---
@@ -466,9 +420,6 @@ filters = {
 
     'name_search': name_search.strip() if name_search else "",
     'name_col': name_col,
-
-    'expertise_search': expertise_search.strip() if expertise_search else "",
-    'expertise_col': expertise_col
 }
 
 
@@ -479,13 +430,7 @@ results = filter_dataframe(df, filters)
 
 
 # --- Display table ---
-display_df = results  # show all columns
-#display_cols = [name_col, email_col]
-#for c in disease_cols + [age_col, gender_col, carer_col, ethnicity_col, expertise_col]:
-    #if c and c not in display_cols:
-        #display_cols.append(c)
-
-#display_df = results[display_cols]
+display_df = results  
 
 st.write("---")
 res1, res2 = st.columns([1,3])
@@ -522,17 +467,6 @@ with res2:
     else:
         st.info("No results match your filters.")
 
-# with res2:
-#     if len(display_df) > 0:
-#         csv = display_df.to_csv(index=False).encode('utf-8')
-#         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
-
-#         st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv")
-#         st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json")
-#     else:
-#         st.info("No results match your filters.")
-        
-#st.dataframe(display_df.reset_index(drop=True), use_container_width=True)
 st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 
@@ -544,6 +478,20 @@ st.markdown(
     "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
     "You can map your own columns above."
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
