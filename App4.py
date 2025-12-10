@@ -168,8 +168,8 @@ def filter_dataframe(d, filters):
             dfc = dfc[dfc[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
 
     # Expertise search (if column exists)
-    if filters.get('expertise_search') and filters.get('expertise_col') in dfc.columns:
-        dfc = dfc[dfc[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
+    # if filters.get('expertise_search') and filters.get('expertise_col') in dfc.columns:
+    #     dfc = dfc[dfc[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
 
     return dfc
 
@@ -248,7 +248,7 @@ year_of_birth_col = get_col(col_map, ['year of birth', 'yob'])
 gender_col = get_col(col_map, ['what is your sex?', 'what is your sex', 'sex', 'gender'])
 ethnicity_col = get_col(col_map, ['what is your ethnic group?', 'ethnic group', 'ethnicity'])
 carer_col = get_col(col_map, ['do you have any caring responsibility?', 'do you have any caring responsibilities?', 'do you have any caring responsibility'])
-expertise_col = get_col(col_map, ['expertise', 'expertise/keywords', 'expertise keywords', 'expertise areas'])
+# expertise_col = get_col(col_map, ['expertise', 'expertise/keywords', 'expertise keywords', 'expertise areas'])
 # If your EDI uses slightly different strings, update the lists above.
 
 # Ensure required columns exist (at least name & email)
@@ -279,7 +279,7 @@ DEFAULT_FILTERS = {
     "filter_selected_carer": "Any",
     "filter_selected_ethnicity": "Any",
     "filter_name_search": "",
-    "filter_expertise_search": "",
+    # "filter_expertise_search": "",
 }
 
 # Initialize missing keys only
@@ -359,7 +359,7 @@ with btn2:
     do_search = st.button("🔍 Search Partners", use_container_width=True)
 
 # Expertse search on its own row
-expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search")
+#expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search")
 
 # ------------------------------------------
 # Build filters dict (feeding into filter_dataframe)
@@ -384,8 +384,8 @@ filters = {
     'name_search': st.session_state.get("filter_name_search", "").strip(),
     'name_col': name_col,
 
-    'expertise_search': st.session_state.get("filter_expertise_search", "").strip(),
-    'expertise_col': expertise_col
+    # 'expertise_search': st.session_state.get("filter_expertise_search", "").strip(),
+    # 'expertise_col': expertise_col
 }
 
 # ------------------------------------------
@@ -427,3 +427,4 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
