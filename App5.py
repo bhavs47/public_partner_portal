@@ -1,53 +1,58 @@
-# app.py
+# app4.py
 """
-PECD Public Partner Search Tool - Combined PECD + EDI Data
-Run: streamlit run app.py
+Public Partner Search Tool - Streamlit app
+Save as app.py and run: streamlit run app.py
 """
-
 from io import BytesIO
 from msal import ConfidentialClientApplication
 import json
 import pandas as pd
 import requests
 import streamlit as st
+import msal
 import uuid
 
-# -----------------------------
 # App Configuration
 # -----------------------------
 st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
-# 1️⃣ Load secrets safely (replace with Streamlit secrets)
+# 1️⃣ Load secrets safely
+# -----------------------------
 TENANT_ID = st.secrets["TENANT_ID"]
 CLIENT_ID = st.secrets["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 REDIRECT_URI = st.secrets["REDIRECT_URI"]
-ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # list of allowed emails
+ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # This should be a list of emails
 SCOPE = ["User.Read"]
 
 # -----------------------------
-# 2️⃣ Initialize MSAL ConfidentialClientApplication
+# 2️⃣ Initialize MSAL PublicClientApplication
 # -----------------------------
-msal_app = ConfidentialClientApplication(
+app = ConfidentialClientApplication(
     client_id=CLIENT_ID,
     client_credential=CLIENT_SECRET,
+    #authority=AUTHORITY
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
 # -----------------------------
-# Prevent re-redeeming the code (store token_result in session_state)
+# Prevent re-redeeming the code
 # -----------------------------
 query_params = st.experimental_get_query_params()
 
 if "token_result" not in st.session_state:
+
+    # No code yet → show login button
     if "code" not in query_params:
         st.title("🔐 Public Partner Portal Login")
-        auth_url = msal_app.get_authorization_request_url(
+
+        auth_url = app.get_authorization_request_url(
             scopes=SCOPE,
             redirect_uri=REDIRECT_URI,
             state=str(uuid.uuid4()),
             prompt="select_account"
         )
+
         st.markdown(
             f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
             f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
@@ -56,14 +61,17 @@ if "token_result" not in st.session_state:
         )
         st.stop()
 
-    # Code exists: redeem once
+    # Code exists → redeem it ONE TIME
     code = query_params["code"][0]
-    token_result = msal_app.acquire_token_by_authorization_code(
+    token_result = app.acquire_token_by_authorization_code(
         code=code,
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI
     )
+
+    # Store token so Streamlit won’t redeem again
     st.session_state["token_result"] = token_result
+
 else:
     token_result = st.session_state["token_result"]
 
@@ -82,31 +90,36 @@ if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-# --------------------------------
-# Helper functions
-# --------------------------------
+# --- Helper functions ---
 @st.cache_data
-def load_excel_from_url(url):
-    try:
-        r = requests.get(url, timeout=30)
-        r.raise_for_status()
-        return pd.read_excel(BytesIO(r.content), engine="openpyxl")
-    except Exception as e:
-        st.error(f"Failed to load {url}: {e}")
+def load_dataframe(uploaded_file):
+    if uploaded_file is None:
         return None
+    fname = uploaded_file.name.lower()
+    try:
+        if fname.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+    except Exception as e:
+        st.error(f"Could not read file: {e}")
+        return None
+    return df
 
 def normalize_cols(df):
-    """Return df and a col_map mapping lowercase->original name"""
+    # Lowercase column names and strip spaces so user can have different column names
     df = df.rename(columns=lambda c: str(c).strip())
-    col_map = {c.lower().strip(): c for c in df.columns}
+    col_map = {}
+    for c in df.columns:
+        lc = c.lower().strip()
+        col_map[lc] = c
     return df, col_map
 
-def get_col(col_map, names):
-    """Return first matching column name (original case) from col_map by testing names list (lowercased)."""
+def get_col(df, col_map, names):
+    # names: list of possible names e.g. ['name','full_name']
     for n in names:
-        key = n.lower().strip()
-        if key in col_map:
-            return col_map[key]
+        if n in col_map:
+            return col_map[n]
     return None
 
 def safe_to_int(x):
@@ -115,143 +128,184 @@ def safe_to_int(x):
     except:
         return None
 
-def filter_dataframe(d, filters):
-    """Apply filters to dataframe d and return filtered df."""
-    dfc = d.copy()
+
+def filter_dataframe(df, filters):
+
+    d = df.copy()
 
     # --- MULTI-DISEASE FILTER ---
     if filters['disease_area'] and filters['disease_area'] != "Any":
-        keyword = str(filters['disease_area']).lower().strip()
-        if filters['disease_cols']:
-            mask = pd.Series(False, index=dfc.index)
-            for col in filters['disease_cols']:
-                mask = mask | dfc[col].astype(str).str.lower().str.strip().str.contains(keyword, na=False)
-            dfc = dfc[mask]
+        keyword = filters['disease_area'].lower()
+        disease_match = False
+
+        for col in filters['disease_cols']:
+            mask = d[col].astype(str).str.lower().str.strip().str.contains(keyword, na=False)
+            disease_match = disease_match | mask
+
+        d = d[disease_match]
 
     # --- Gender ---
-    if filters.get('gender') and filters['gender'] != "Any" and filters.get('gender_col'):
-        dfc = dfc[dfc[filters['gender_col']].astype(str).str.lower().str.strip() == filters['gender'].lower().strip()]
+    if filters['gender'] != "Any" and filters['gender_col']:
+        before = len(d)
+        d = d[d[filters['gender_col']].astype(str).str.lower().str.strip() == filters['gender'].lower().strip()]
 
     # --- Ethnicity ---
-    if filters.get('ethnicity') and filters['ethnicity'] != "Any" and filters.get('ethnicity_col'):
-        dfc = dfc[dfc[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
-
-    # --- Carer ---
-    if filters.get('carer') and filters['carer'] != "Any" and filters.get('carer_col'):
-        dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip() == filters['carer'].lower().strip()]
+    if filters['ethnicity'] != "Any" and filters['ethnicity_col']:
+        before = len(d)
+        d = d[d[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
 
     # Age filter
-    min_age = filters.get('min_age')
-    max_age = filters.get('max_age')
+    min_age = filters['min_age']
+    max_age = filters['max_age']
 
-    if min_age is not None and max_age is not None:
-        if (min_age == 0 and max_age == 0):
-            # treat as not filtering by age
-            pass
-        else:
-            if max_age < min_age:
-                st.error("⚠️ Max Age cannot be less than Min Age.")
-                return dfc
-            if filters.get('age_col'):
-                # convert to numeric temporarily
-                numeric_col = filters['age_col'] + "_num_temp"
-                dfc[numeric_col] = pd.to_numeric(dfc[filters['age_col']], errors='coerce')
-                dfc = dfc[dfc[numeric_col].between(min_age, max_age, inclusive='both')]
-                dfc.drop(columns=[numeric_col], inplace=True)
+    # CASE 1: Age not entered → skip filtering
+    # (Assuming empty age inputs become 0 — adjust if needed)
+    if (min_age == 0 and max_age == 0) or (min_age is None and max_age is None):
+        # No age filter — return other filters' results
+        pass  # do nothing and continue with other filters
+
+    else:
+        # CASE 2: Invalid range → show message (no crash)
+        if max_age < min_age:
+            st.error("⚠️ Max Age cannot be less than Min Age.")
+            return d  # return unfiltered (except for other filters already applied)
+
+        # CASE 3: Valid range → apply age filter
+        if filters['age_col']:
+            d[filters['age_col'] + "_num"] = pd.to_numeric(
+                d[filters['age_col']], errors='coerce'
+            )
+
+            d = d[
+                d[filters['age_col'] + "_num"].between(
+                    min_age, max_age, inclusive='both'
+                )
+            ]
+
+            d.drop(columns=[filters['age_col'] + "_num"], inplace=True)
 
     # Name search
-    if filters.get('name_search'):
-        if filters.get('name_col'):
-            dfc = dfc[dfc[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
+    if filters['name_search']:
+        before = len(d)
+        d = d[d[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
+        
+    return d
 
-    # Expertise search (if column exists)
-    if filters.get('expertise_search') and filters.get('expertise_col'):
-        dfc = dfc[dfc[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
 
-    return dfc
+def sample_dataframe():
+    data = [
+        {"name": "Alice Smith", "email": "alice@example.com", "disease1": "Diabetes", "disease2": "", "age": 34, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        {"name": "Bob Jones", "email": "bob@example.com", "disease1": "Cancer", "disease2": "Heart Disease", "age": 45, "gender": "Male", "ethnicity": "Black", "expertise": "patient advocacy"},
+        {"name": "Cathy Brown", "email": "cathy@example.com", "disease1": "Cancer", "disease2": "", "age": 52, "gender": "Female", "ethnicity": "White", "expertise": "clinical trials"},
+        {"name": "Daniel Green", "email": "daniel@example.com", "disease1": "Diabetes", "disease2": "Arthritis", "age": 60, "gender": "Male", "ethnicity": "Asian", "expertise": "research"},
+    ]
+    return pd.DataFrame(data)
 
-# --------------------------------
-# Load & Merge PECD + EDI datasets
-# --------------------------------
-# Replace these URLs with your repository file paths (raw URLs)
-PECD_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/PECD%20Pool%20Data.xlsx"  # your PECD file
-EDI_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/EDI%20Data.xlsx"   # your EDI file (update path/name)
 
-# Try to load both files. If your single file contains both sheets, you can adjust this block.
-df_pecd = load_excel_from_url(PECD_URL)
-df_edi = load_excel_from_url(EDI_URL)
 
-if df_pecd is None:
-    st.error("Failed to load PECD Pool Data.")
-    st.stop()
-if df_edi is None:
-    st.error("Failed to load EDI Data.")
-    st.stop()
+# After successful authentication
+claims = token_result.get("id_token_claims", {})
 
-# Normalize columns and build lowercase->original maps
-df_pecd, pecd_map = normalize_cols(df_pecd)
-df_edi, edi_map = normalize_cols(df_edi)
+user_email = claims.get("preferred_username", "Unknown")
+user_name = claims.get("name", "Unknown")
 
-# Find ID columns in each dataset
-# Try many common ID variations
-id_names = ["id", "participant id", "unique id", "identifier"]
-pecd_id_col = None
-edi_id_col = None
-for name in id_names:
-    if pecd_id_col is None and name in pecd_map:
-        pecd_id_col = pecd_map[name]
-    if edi_id_col is None and name in edi_map:
-        edi_id_col = edi_map[name]
+# Displaying the app header with user info
+with st.container():
+    col1, col2 = st.columns([3,1])
+    
+    with col1:
+        st.markdown("## PECD Public Partner Search Tool")
+        st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
+    
+    with col2:
+        st.markdown(
+            f"""
+            <div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>
+                <small style='color:#2f6fdb'>Signed in as: <b>{user_name}</b></small><br>
+                <small style='color:#2f6fdb'>Email: <b>{user_email}</b></small>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-# Fallback: look for first column (if ID really is column A)
-if pecd_id_col is None and len(df_pecd.columns) > 0:
-    pecd_id_col = df_pecd.columns[0]
-if edi_id_col is None and len(df_edi.columns) > 0:
-    edi_id_col = df_edi.columns[0]
 
-if pecd_id_col is None or edi_id_col is None:
-    st.error("Could not find ID column in one or both datasets. Ensure both have an ID column.")
-    st.stop()
 
-# Merge on ID (use left join so we preserve PECD rows)
+
+
+st.write("---")
+
+# Raw GitHub URL (make sure it ends with .xlsx)
+dataset_url = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/Database.xlsx"
+
 try:
-    df_merged = df_pecd.merge(df_edi, left_on=pecd_id_col, right_on=edi_id_col, how="left", suffixes=("", "_EDI"))
-except Exception as e:
-    st.error(f"Error merging datasets: {e}")
-    st.stop()
+    # Download the file content
+    response = requests.get(dataset_url)
+    response.raise_for_status()  # ensure download succeeded
 
-# Reorder columns: PECD columns first, then EDI-only columns
-pecd_cols = list(df_pecd.columns)
-merged_cols = list(df_merged.columns)
-edi_only_cols = [c for c in merged_cols if c not in pecd_cols]
+    # Read Excel from bytes
+    df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
+    #st.success("Dataset already loaded successfully!")
 
-df = df_merged[pecd_cols + edi_only_cols].copy()
-df.index = df.index + 1  # make index start at 1 for display
+except requests.exceptions.RequestException as e:
+    st.error(f"Failed to download file: {e}")
+except ValueError as e:
+    st.error(f"Failed to read Excel file: {e}")
 
-# Build a col_map for the merged df (lowercase->original)
+
+# Adjust the index to start from 1 instead of 0
+df.index = df.index + 1
+    
+def load_dataframe_from_github(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
+        return df
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to download file: {e}")
+        return None
+    except ValueError as e:
+        st.error(f"Failed to read Excel file: {e}")
+        return None
+
+# Load the dataset
+df = load_dataframe_from_github(dataset_url)
+if df is None:
+    st.stop()  # stop the app if loading failed
+
+# normalize columns and detect important columns
 df, col_map = normalize_cols(df)
 
-# --------------------------------
-# Auto-detect relevant columns in merged df
-# --------------------------------
-# disease columns: any column containing "Disease Experience" (case-insensitive)
-disease_cols = [c for c in df.columns if "disease experience" in c.lower()]
+# --- Automatically detect disease columns ---
+disease_cols = [
+    "1st Disease Experience",
+    "2nd Disease Experience",
+    "3rd Disease Experience",
+    "4th Disease Experience",
+    "5th Disease Experience"
+]
 
-# best-guess mappings for demographic columns (adjust keys if your exact wording differs)
-name_col = get_col(col_map, ['name', 'full name', 'participant name'])
-email_col = get_col(col_map, ['email', 'email id', 'email address'])
-age_col = get_col(col_map, ['age', 'what is your age'])
-year_of_birth_col = get_col(col_map, ['year of birth', 'yob'])
-gender_col = get_col(col_map, ['what is your sex?', 'what is your sex', 'sex', 'gender'])
-ethnicity_col = get_col(col_map, ['what is your ethnic group?', 'ethnic group', 'ethnicity'])
-carer_col = get_col(col_map, ['do you have any caring responsibility?', 'do you have any caring responsibilities?', 'do you have any caring responsibility'])
-expertise_col = get_col(col_map, ['expertise', 'expertise/keywords', 'expertise keywords', 'expertise areas'])
-# If your EDI uses slightly different strings, update the lists above.
+disease_cols = [col for col in df.columns if "Disease Experience" in col]
 
+# Guess columns (common names)
+name_col = get_col(df, col_map, ['name'])
+email_col = get_col(df, col_map, ['email id'])
+age_col = get_col(df, col_map, ['age'])
+disability_col = get_col(df, col_map, ['do you consider yourself to be a disabled person?'])
+physical_col = get_col(df, col_map, ['do you have any physical or mental health conditions or illness lasting or expected to last for 12 months or more?'])
+ethnicity_col = get_col(df, col_map, ['what is your ethnic group? choose one option that best describes your ethnic group or background?'])
+religion_col = get_col(df, col_map, ['what is your religion?'])
+gender_col = get_col(df, col_map, ['what is your sex?'])
+transgender_col = get_col(df, col_map, ['do you identify as trans?'])
+sexualorientation_col = get_col(df, col_map, ['which of the following best describes your sexual orientation?'])
+carer_col = get_col(df, col_map, ['do you have any caring responsibility?'])
+    
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
-    st.error("Your merged dataset must include columns for Name and Email. Detected columns: " + ", ".join(df.columns))
+    st.error("Your uploaded file must include columns for Name and Email (e.g. 'name' and 'email').\n"
+             "Detected columns: " + ", ".join(df.columns))
     st.stop()
+
 
 # ------------------------------------------
 # 1. Build filter option lists
@@ -260,10 +314,12 @@ all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
 
-disease_options = ["Any"] + sorted([d for d in all_diseases if str(d).strip() != ""])
+disease_options = ["Any"] + sorted(all_diseases)
+
 gender_options = ["Any"] if not gender_col else ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
 carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dropna().astype(str).unique())
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
+
 
 # ------------------------------------------
 # 2. Filter defaults (MASTER DEFINITION)
@@ -284,38 +340,15 @@ for k, v in DEFAULT_FILTERS.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-# Reset function for Clear button (called via on_click)
+# ------------------------------------------
+# Reset function for Clear button
+# ------------------------------------------
 def reset_filters():
     for k, v in DEFAULT_FILTERS.items():
         st.session_state[k] = v
 
 # ------------------------------------------
-# PAGE HEADER (show user)
-# ------------------------------------------
-claims = token_result.get("id_token_claims", {})
-user_name = claims.get("name", "Unknown")
-user_email = claims.get("preferred_username", "Unknown")
-
-with st.container():
-    col1, col2 = st.columns([3,1])
-    with col1:
-        st.markdown("## PECD Public Partner Search Tool")
-        st.markdown("Filter profiles by criteria to find relevant public partners for engagement.")
-    with col2:
-        st.markdown(
-            f"""
-            <div style='background:#e9f0ff;padding:10px;border-radius:8px;text-align:right'>
-                <small style='color:#2f6fdb'>Signed in as: <b>{user_name}</b></small><br>
-                <small style='color:#2f6fdb'>Email: <b>{user_email}</b></small>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-st.write("---")
-
-# ------------------------------------------
-# 3. UI Widgets (consistent keys)
+# 3. UI Widgets (now using consistent keys)
 # ------------------------------------------
 st.markdown("### Search Filters for Public Partners")
 f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
@@ -344,81 +377,104 @@ with f5:
         "Ethnicity", ethnicity_options, key="filter_selected_ethnicity"
     )
 
-# One-row: name input + clear + search buttons aligned with input
-g1, btn1, btn2 = st.columns([3,1,1])
+g1, btn1, btn2 = st.columns([2,1,1])
 with g1:
-    # Use a caption to reduce vertical height (helps alignment)
-    st.caption("Partner Name Search")
-    name_search = st.text_input("", placeholder="e.g. Alice", key="filter_name_search")
+    name_search = st.text_input(
+        "Partner Name Search", placeholder="e.g. Alice", key="filter_name_search"
+    )
+
+# ------------------------------------------
+# 4. Buttons
+# ------------------------------------------
+
 with btn1:
-    st.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
+    clear_clicked = st.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
+
 with btn2:
+    st.markdown("<div style='margin-top:27px'></div>", unsafe_allow_html=True)
     do_search = st.button("🔍 Search Partners", use_container_width=True)
 
-# Expertse search on its own row
-expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search")
 
-# ------------------------------------------
-# Build filters dict (feeding into filter_dataframe)
-# ------------------------------------------
+
+# --- Build filters dict ---
 filters = {
-    'disease_area': st.session_state.get("filter_selected_disease", "Any"),
+    'disease_area': selected_disease,
     'disease_cols': disease_cols,
 
-    'gender': st.session_state.get("filter_selected_gender", "Any"),
+    'gender': selected_gender,
     'gender_col': gender_col,
 
-    'carer': st.session_state.get("filter_selected_carer", "Any"),
+    'carer': selected_carer,
     'carer_col': carer_col,
 
-    'ethnicity': st.session_state.get("filter_selected_ethnicity", "Any"),
+    'ethnicity': selected_ethnicity,
     'ethnicity_col': ethnicity_col,
+    
+    #'ethnicity': eth_col,
+    #'ethnicity_col': ethnicity_col,
 
-    'min_age': st.session_state.get("filter_min_age", 0),
-    'max_age': st.session_state.get("filter_max_age", 120),
+    'min_age': min_age_val,
+    'max_age': max_age_val,
     'age_col': age_col,
 
-    'name_search': st.session_state.get("filter_name_search", "").strip(),
+    'name_search': name_search.strip() if name_search else "",
     'name_col': name_col,
-
-    'expertise_search': st.session_state.get("filter_expertise_search", "").strip(),
-    'expertise_col': expertise_col
 }
 
-# ------------------------------------------
-# Apply filtering
-# ------------------------------------------
-results = filter_dataframe(df, filters)
-display_df = results.copy()
 
-# ------------------------------------------
-# Display results + export buttons
-# ------------------------------------------
+
+
+# --- Filter ---
+results = filter_dataframe(df, filters)
+
+
+# --- Display table ---
+display_df = results  
+
 st.write("---")
 res1, res2 = st.columns([1,3])
+
 with res1:
     st.markdown(f"**Search Results ({len(display_df)})**")
+
 with res2:
     if len(display_df) > 0:
         csv = display_df.to_csv(index=False).encode('utf-8')
         json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
 
+        # --- Two buttons side by side ---
         col1, col2 = st.columns(2)
+
         with col1:
-            st.download_button("Export CSV", data=csv, file_name="filtered_participants.csv", mime="text/csv", use_container_width=True)
+            st.download_button(
+                "Export CSV",
+                data=csv,
+                file_name="filtered_participants.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+
         with col2:
-            st.download_button("Export JSON", data=json_bytes, file_name="filtered_participants.json", mime="application/json", use_container_width=True)
+            st.download_button(
+                "Export JSON",
+                data=json_bytes,
+                file_name="filtered_participants.json",
+                mime="application/json",
+                use_container_width=True
+            )
+
     else:
         st.info("No results match your filters.")
 
-# Show the filtered table
 st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-with st.expander("Show Full Data (first 2000 rows)"):
+
+with st.expander("Show Full Data"):
     st.dataframe(df.head(2000), hide_index=True)
 
 st.markdown("---")
 st.markdown(
-    "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
-    "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
+    "Tips: Upload an Excel (.xlsx) or CSV containing Name, Email, and Disease columns. "
+    "You can map your own columns above."
 )
