@@ -174,8 +174,8 @@ def filter_dataframe(d, filters):
 # Load & Merge PECD + EDI datasets
 # --------------------------------
 # Replace these URLs with your repository file paths (raw URLs)
-PECD_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/PECD.xlsx"  # your PECD file
-EDI_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/EDI.xlsx"   # your EDI file (update path/name)
+PECD_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/PECD%20Pool%20Data.xlsx"  # your PECD file
+EDI_URL = "https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/EDI%20Data.xlsx"   # your EDI file (update path/name)
 
 # Try to load both files. If your single file contains both sheets, you can adjust this block.
 df_pecd = load_excel_from_url(PECD_URL)
