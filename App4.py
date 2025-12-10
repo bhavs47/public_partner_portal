@@ -125,19 +125,21 @@ def filter_dataframe(d, filters):
         if filters['disease_cols']:
             mask = pd.Series(False, index=dfc.index)
             for col in filters['disease_cols']:
-                mask = mask | dfc[col].astype(str).str.lower().str.strip().str.contains(keyword, na=False)
+                # guard if column missing for some rows
+                if col in dfc.columns:
+                    mask = mask | dfc[col].astype(str).str.lower().str.strip().str.contains(keyword, na=False)
             dfc = dfc[mask]
 
     # --- Gender ---
-    if filters.get('gender') and filters['gender'] != "Any" and filters.get('gender_col'):
+    if filters.get('gender') and filters['gender'] != "Any" and filters.get('gender_col') in dfc.columns:
         dfc = dfc[dfc[filters['gender_col']].astype(str).str.lower().str.strip() == filters['gender'].lower().strip()]
 
     # --- Ethnicity ---
-    if filters.get('ethnicity') and filters['ethnicity'] != "Any" and filters.get('ethnicity_col'):
+    if filters.get('ethnicity') and filters['ethnicity'] != "Any" and filters.get('ethnicity_col') in dfc.columns:
         dfc = dfc[dfc[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
 
     # --- Carer ---
-    if filters.get('carer') and filters['carer'] != "Any" and filters.get('carer_col'):
+    if filters.get('carer') and filters['carer'] != "Any" and filters.get('carer_col') in dfc.columns:
         dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip() == filters['carer'].lower().strip()]
 
     # Age filter
@@ -152,20 +154,21 @@ def filter_dataframe(d, filters):
             if max_age < min_age:
                 st.error("⚠️ Max Age cannot be less than Min Age.")
                 return dfc
-            if filters.get('age_col'):
+            if filters.get('age_col') in dfc.columns:
                 # convert to numeric temporarily
                 numeric_col = filters['age_col'] + "_num_temp"
                 dfc[numeric_col] = pd.to_numeric(dfc[filters['age_col']], errors='coerce')
-                dfc = dfc[dfc[numeric_col].between(min_age, max_age, inclusive='both')]
+                # between inclusive handling depends on pandas version; the call below is robust for common versions
+                dfc = dfc[(dfc[numeric_col] >= min_age) & (dfc[numeric_col] <= max_age)]
                 dfc.drop(columns=[numeric_col], inplace=True)
 
     # Name search
     if filters.get('name_search'):
-        if filters.get('name_col'):
+        if filters.get('name_col') in dfc.columns:
             dfc = dfc[dfc[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
 
     # Expertise search (if column exists)
-    if filters.get('expertise_search') and filters.get('expertise_col'):
+    if filters.get('expertise_search') and filters.get('expertise_col') in dfc.columns:
         dfc = dfc[dfc[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
 
     return dfc
@@ -401,7 +404,9 @@ with res1:
 with res2:
     if len(display_df) > 0:
         csv = display_df.to_csv(index=False).encode('utf-8')
-        json_bytes = json.dumps(display_df.to_dict(orient='records'), indent=2).encode('utf-8')
+        # safe JSON conversion to avoid serialization errors
+        safe_json = display_df.astype(object).where(pd.notna(display_df), None).to_dict(orient="records")
+        json_bytes = json.dumps(safe_json, indent=2, default=str).encode("utf-8")
 
         col1, col2 = st.columns(2)
         with col1:
