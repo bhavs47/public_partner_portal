@@ -182,26 +182,25 @@ if email not in ALLOWED_EMAILS:
 # -----------------------------
 # Top-right Sign Out Button (Streamlit-native)
 # -----------------------------
-st.markdown(
-    """
+st.markdown("""
     <style>
-        .top-right-signout {
+        div[data-testid="stToolbar"] {visibility: hidden;}
+        div.stButton > button {
+            background-color: #FF4B4B;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 15px;
+            border: none;
+        }
+        .signout-container {
             position: fixed;
             top: 15px;
-            right: 20px;
-            z-index: 9999;
+            right: 25px;
+            z-index: 999999;
         }
     </style>
-    <div class="top-right-signout">
-        <button onclick="fetch('/_stcore/trigger_signout', {method: 'POST'}).then(() => window.location.reload());"
-                style="background:#FF4B4B; color:white; padding:8px 16px; border:none;
-                       border-radius:6px; font-size:15px; cursor:pointer;">
-            Sign Out
-        </button>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 # Detect logout via POST submit
 if st.session_state.get("logout_request") is None:
@@ -653,6 +652,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
