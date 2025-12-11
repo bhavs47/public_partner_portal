@@ -179,9 +179,14 @@ if st.button("Sign Out"):
     sign_out()
 
 
-# -------------------------
-# Main app content
-# -------------------------
+# Ensure token_result and claims exist
+claims = token_result.get("id_token_claims", {})
+
+# Get user's name, fallback to email or "User"
+name = claims.get("name") or claims.get("preferred_username") or "User"
+
+st.session_state["user_name"] = name
+
 st.write(f"Welcome, {name}!")
 
 
@@ -613,6 +618,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
