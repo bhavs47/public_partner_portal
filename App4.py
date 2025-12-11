@@ -245,9 +245,9 @@ name_col = get_col(col_map, ['name', 'full name', 'participant name'])
 email_col = get_col(col_map, ['email', 'email id', 'email address'])
 age_col = get_col(col_map, ['age', 'what is your age'])
 year_of_birth_col = get_col(col_map, ['year of birth', 'yob'])
-gender_col = get_col(col_map, ['what is your sex?', 'what is your sex', 'sex', 'gender'])
-ethnicity_col = get_col(col_map, ['what is your ethnic group?', 'ethnic group', 'ethnicity'])
-carer_col = get_col(col_map, ['do you have any caring responsibility?', 'do you have any caring responsibilities?', 'do you have any caring responsibility'])
+gender_col = get_col(col_map, ['what is your sex? A question about gender identity will follow.'])
+ethnicity_col = get_col(col_map, ['what is your ethnic group? choose one option that best describes your ethnic group or background.'])
+carer_col = get_col(col_map, ['do you have any caring responsibilities? (if you share care responsibilities equally then please answer as the primary carer)'])
 # expertise_col = get_col(col_map, ['expertise', 'expertise/keywords', 'expertise keywords', 'expertise areas'])
 # If your EDI uses slightly different strings, update the lists above.
 
@@ -427,4 +427,5 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
