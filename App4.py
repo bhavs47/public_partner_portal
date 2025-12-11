@@ -71,10 +71,43 @@ else:
 # -----------------------------
 # Check token + email
 # -----------------------------
-if "access_token" not in token_result:
-    st.error("❌ Authentication failed.")
-    st.json(token_result)
+# if "access_token" not in token_result:
+#     st.error("❌ Authentication failed.")
+#     st.json(token_result)
+#     st.stop()
+
+# -------------------------------------------------------
+# Check token validity and detect expiration
+# -------------------------------------------------------
+def show_login_page():
+    st.title("🔐 Public Partner Portal Login")
+    auth_url = msal_app.get_authorization_request_url(
+        scopes=SCOPE,
+        redirect_uri=REDIRECT_URI,
+        state=str(uuid.uuid4()),
+        prompt="select_account"
+    )
+    st.markdown(
+        f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
+        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+        f'Sign in with Microsoft</a>',
+        unsafe_allow_html=True
+    )
     st.stop()
+
+
+# If no token or expired, show login
+if (
+    "access_token" not in token_result
+    or token_result.get("error") == "invalid_grant"
+    or token_result.get("suberror") == "bad_token"
+):
+    # Reset session to clean state
+    st.session_state.pop("token_result", None)
+
+    # Show login again
+    show_login_page()
+
 
 email = token_result["id_token_claims"].get("preferred_username")
 st.session_state["user_email"] = email
@@ -510,3 +543,4 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
