@@ -216,11 +216,8 @@ st.html("""
 """)
 
 # Handle actual logout action
-# if st.query_params.get("signout") == ["true"]:
-#     for key in ["token_result", "user_name", "user_email"]:
-#         st.session_state.pop(key, None)
-#     st.query_params.clear()
-#     st.experimental_rerun()
+if st.query_params.get("signout") == ["true"]:
+    sign_out()
 
 
 # Detect logout via POST submit
@@ -673,6 +670,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
