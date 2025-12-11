@@ -82,39 +82,45 @@ def show_login_page():
         prompt="select_account"
     )
 
-    st.markdown(
-    f"""
-    <div style='position: relative; width: 100%; height: 100vh;'>
-
-        <!-- Top-left University text -->
-        <div style='position: absolute; top: 20px; left: 20px; color: white; font-size: 18px; font-weight: bold; line-height: 1.2;'>
-            University<br>of Leeds
-        </div>
-
-        <!-- Centered main heading -->
-        <h1 style='text-align:center; margin-top: 150px; margin-bottom:20px; color:white;'>
-            Public Partner Search Tool
-        </h1>
-
-        <!-- Centered button -->
-        <div style='text-align:center; margin-top:20px;'>
-            <a href="{auth_url}"
-                style="
-                    font-size:20px;
-                    padding:10px 20px;
-                    background:#28a745;
-                    color:white;
-                    border-radius:8px;
-                    text-decoration:none;
-                ">
-                Sign In
-            </a>
-        </div>
-
+    # Top-left University of Leeds
+st.markdown(
+    """
+    <div style='position:absolute; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; line-height:1.2;'>
+        University<br>of Leeds
     </div>
     """,
     unsafe_allow_html=True
 )
+
+# Centered heading
+st.markdown(
+    """
+    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
+        Public Partner Search Tool
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+
+# Centered sign-in button
+st.markdown(
+    f"""
+    <div style='text-align:center; margin-top:20px;'>
+        <a href="{auth_url}"
+            style="
+                font-size:20px;
+                padding:10px 20px;
+                background:#28a745;
+                color:white;
+                border-radius:8px;
+                text-decoration:none;
+            ">
+            Sign in with Microsoft
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
 
 
 
@@ -619,6 +625,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
