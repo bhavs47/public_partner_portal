@@ -202,6 +202,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Top-right button container
+st.markdown('<div class="signout-container">', unsafe_allow_html=True)
+
+if st.button("Sign Out"):
+    for key in ["token_result", "user_name", "user_email"]:
+        st.session_state.pop(key, None)
+    st.experimental_rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
+
 # Detect logout via POST submit
 if st.session_state.get("logout_request") is None:
     st.session_state["logout_request"] = False
@@ -652,6 +662,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
