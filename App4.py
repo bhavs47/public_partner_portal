@@ -93,7 +93,7 @@ def show_login_page():
             style="
                 font-size:20px;
                 padding:10px 20px;
-                background:#2F80ED;
+                background:#28a745;
                 color:white;
                 border-radius:8px;
                 text-decoration:none;
@@ -606,6 +606,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
