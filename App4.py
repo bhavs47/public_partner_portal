@@ -102,7 +102,7 @@ def show_login_page():
                 style="
                     font-size:20px;
                     padding:10px 20px;
-                    background:#28a745;  /* green button */
+                    background:#28a745;
                     color:white;
                     border-radius:8px;
                     text-decoration:none;
@@ -115,6 +115,7 @@ def show_login_page():
     """,
     unsafe_allow_html=True
 )
+
 
 
     #---- Background Image - University of Leeds ------------------
@@ -618,6 +619,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
