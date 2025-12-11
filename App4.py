@@ -133,13 +133,16 @@ def show_login_page():
     )
     st.stop()
 
+
+
+
+
 # -----------------------------
 # Sign Out Function
 # -----------------------------
 def sign_out():
     for key in ["token_result", "user_email", "user_name"]:
-        if key in st.session_state:
-            st.session_state.pop(key)
+        st.session_state.pop(key, None)
     st.experimental_rerun()
 
 # -----------------------------
@@ -177,52 +180,55 @@ if email not in ALLOWED_EMAILS:
     st.stop()
 
 # -----------------------------
-# Top-right Sign Out Button (Fixed Position)
+# Top-right Sign Out Button (CSS positioned)
 # -----------------------------
-
-# Hidden button trigger
-signout_clicked = st.session_state.get("signout_clicked", False)
-
-# CSS + HTML fixed-position button
 st.markdown(
     """
     <style>
-        .top-right-signout {
+        .signout-btn-container {
             position: fixed;
             top: 10px;
-            right: 12px;
+            right: 15px;
             z-index: 9999;
         }
-        .top-right-signout button {
+        .signout-btn-container button {
             background-color: #FF4B4B !important;
             color: white !important;
             border: none !important;
-            padding: 8px 15px !important;
-            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            border-radius: 6px !important;
             font-size: 15px !important;
-            cursor: pointer;
             font-weight: 600;
+            cursor: pointer;
         }
-        .top-right-signout button:hover {
-            opacity: 0.85;
+        .signout-btn-container button:hover {
+            opacity: 0.9;
         }
     </style>
 
-    <div class="top-right-signout">
+    <div class="signout-btn-container">
         <form action="" method="post">
-            <button name="signout" type="submit">Sign Out</button>
+            <button type="submit" name="logout">Sign Out</button>
         </form>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# Detect form submission
-if st.query_params.get("signout") == ["true"]:
-    st.session_state["signout_clicked"] = True
+# Detect logout via POST submit
+if st.session_state.get("logout_request") is None:
+    st.session_state["logout_request"] = False
 
-if st.session_state.get("signout_clicked"):
+# Streamlit captures POST inside st.form submissions using widgets,
+# but raw HTML forms do not set session variables.
+# However, Streamlit *does* expose form submits via query rerun detection.
+
+if "logout" in st.experimental_get_query_params():  # only safe method
+    st.session_state["logout_request"] = True
+
+if st.session_state["logout_request"]:
     sign_out()
+
 
 
 
@@ -659,6 +665,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
