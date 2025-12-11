@@ -214,38 +214,6 @@ st.html("""
     </div>
 """)
 
-
-if query_params.get("signout") == ["true"]:
-    sign_out()
-        
-# # Handle actual logout action
-# if st.query_params.get("signout") == ["true"]:
-#     sign_out()
-
-
-# # Detect logout via POST submit
-# if st.session_state.get("logout_request") is None:
-#     st.session_state["logout_request"] = False
-
-# # Streamlit captures POST inside st.form submissions using widgets,
-# # but raw HTML forms do not set session variables.
-# # However, Streamlit *does* expose form submits via query rerun detection.
-
-# if "logout" in st.experimental_get_query_params():  # only safe method
-#     st.session_state["logout_request"] = True
-
-# if st.session_state["logout_request"]:
-#     sign_out()
-
-
-
-
-
-
-
-
-
-
 # --------------------------------
 # Helper functions
 # --------------------------------
@@ -673,6 +641,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
