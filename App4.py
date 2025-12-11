@@ -283,6 +283,7 @@ DEFAULT_FILTERS = {
     "filter_max_age": 120,
     "filter_selected_carer": "Any",
     "filter_selected_ethnicity": "Any",
+    "filter_selected_sexuality": "Any",
     "filter_name_search": "",
     # "filter_expertise_search": "",
 }
@@ -326,7 +327,7 @@ st.write("---")
 # 3. UI Widgets (consistent keys)
 # ------------------------------------------
 st.markdown("### Search Filters for Public Partners")
-f1, f2, f3, f4, f5 = st.columns([2,2,2,2,2])
+f1, f2, f3, f4, f5, f6 = st.columns([2,2,2,2,2,2])
 
 with f1:
     selected_disease = st.selectbox(
@@ -350,6 +351,10 @@ with f4:
 with f5:
     selected_ethnicity = st.selectbox(
         "Ethnicity", ethnicity_options, key="filter_selected_ethnicity"
+    )
+with f6:
+    selected_sexuality = st.selectbox(
+        "Sexuality", sexuality_options, key="filter_selected_sexuality"
     )
 
 # One-row: name input + clear + search buttons aligned with input
@@ -435,6 +440,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
