@@ -168,7 +168,7 @@ if email not in ALLOWED_EMAILS:
 # -------------------------
 st.markdown(
     f"""
-    <div style='position:absolute; top:10px; right:10px; z-index:1000;'>
+    <div style='position:right; top:10px; right:10px; z-index:1000;'>
     </div>
     """,
     unsafe_allow_html=True
@@ -618,6 +618,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
