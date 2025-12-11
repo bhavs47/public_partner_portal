@@ -119,20 +119,23 @@ def show_login_page():
     st.stop()
 
 # Function to sign out
-# -------------------------
 def sign_out():
-    if "token_result" in st.session_state:
-        st.session_state.pop("token_result")
-    if "user_email" in st.session_state:
-        st.session_state.pop("user_email")
-    st.experimental_rerun()  # reload the app to show login page
+    for key in ["token_result", "user_name"]:
+        if key in st.session_state:
+            st.session_state.pop(key)
+    st.experimental_rerun()
 
+
+# -------------------------
+# Main logic
+# -------------------------
+query_params = st.experimental_get_query_params()
 
 if "token_result" not in st.session_state:
     if "code" not in query_params:
         show_login_page()
 
-    # Code exists: redeem once
+    # Redeem code
     code = query_params["code"][0]
     token_result = msal_app.acquire_token_by_authorization_code(
         code=code,
@@ -143,27 +146,27 @@ if "token_result" not in st.session_state:
 else:
     token_result = st.session_state["token_result"]
 
-
-# If no token or expired, show login
+# Validate token
 if (
     "access_token" not in token_result
     or token_result.get("error") == "invalid_grant"
     or token_result.get("suberror") == "bad_token"
 ):
-    # Reset session to clean state
     st.session_state.pop("token_result", None)
-
-    # Show login again
     show_login_page()
 
+# Get user's name
+claims = token_result.get("id_token_claims", {})
+name = claims.get("name") or claims.get("preferred_username") or "User"
+st.session_state["user_name"] = name
 
-email = token_result["id_token_claims"].get("preferred_username")
-st.session_state["user_email"] = email
-
-if email not in ALLOWED_EMAILS:
+# Restrict access
+if name not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
+
+# -------------------------
 # Top-right Sign Out as HTML button
 # -------------------------
 sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
@@ -624,6 +627,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
