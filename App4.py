@@ -42,20 +42,7 @@ query_params = st.experimental_get_query_params()
 
 if "token_result" not in st.session_state:
     if "code" not in query_params:
-        st.title("🔐 Public Partner Portal Login")
-        auth_url = msal_app.get_authorization_request_url(
-            scopes=SCOPE,
-            redirect_uri=REDIRECT_URI,
-            state=str(uuid.uuid4()),
-            prompt="select_account"
-        )
-        st.markdown(
-            f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-            f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-            f'Sign in with Microsoft</a>',
-            unsafe_allow_html=True
-        )
-        st.stop()
+        show_login_page()
 
     # Code exists: redeem once
     code = query_params["code"][0]
@@ -543,4 +530,5 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
