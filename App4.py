@@ -109,25 +109,18 @@ def show_login_page():
     st.markdown(
     f"""
     <style>
-    /* Full page background via Streamlit container */
     .stApp {{
-        background-image: url('https://www.leeds.ac.uk/site/custom_scripts/images/university-of-leeds-campus.jpg');
+        background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
         background-size: cover;
+        background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-        background-position: center;
-    }}
-
-    /* Optional: slightly transparent content to improve readability */
-    .css-1d391kg {{
-        background-color: rgba(255, 255, 255, 0.85);
-        border-radius: 10px;
-        padding: 1rem;
     }}
     </style>
     """,
     unsafe_allow_html=True
 )
+
  
     st.stop()
 
@@ -604,6 +597,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
