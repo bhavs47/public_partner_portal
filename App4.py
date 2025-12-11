@@ -1,14 +1,13 @@
 # App4.py
 """
 PECD Public Partner Search Tool - Combined PECD + EDI Data
-Run: streamlit run App4_clean.py
+Run: streamlit run App4.py
 """
 
 import uuid
 import json
 from io import BytesIO
 from datetime import date
-
 import pandas as pd
 import requests
 import streamlit as st
@@ -134,119 +133,6 @@ def show_login_page():
     )
     st.stop()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# query_params = st.experimental_get_query_params()
-
-# # -----------------------------
-# # Landing Page / Login
-# # -----------------------------
-# def show_login_page():
-#     auth_url = msal_app.get_authorization_request_url(
-#         scopes=SCOPE,
-#         redirect_uri=REDIRECT_URI,
-#         state=str(uuid.uuid4()),
-#         prompt="select_account"
-#     )
-
-#     st.markdown(
-#         f"""
-#         <style>
-#         .stApp {{
-#             background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-#             background-size: cover;
-#             background-position: center;
-#             background-attachment: fixed;
-#             filter: brightness(0.7);
-#         }}
-
-#         /* MAIN TOP HEADING */
-#         .top-heading {{
-#             width: 100%;
-#             text-align: center;
-#             font-size: 3.2rem;
-#             font-weight: 800;
-#             margin-top: 40px;
-#             color: white;
-#             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-#             letter-spacing: 1px;
-#         }}
-        
-#         .login-container {{
-#             display: flex;
-#             flex-direction: column;
-#             justify-content: center;
-#             align-items: center;
-#             height: 90vh;
-#             text-align: center;
-#             color: white;
-#             animation: fadeIn 1.5s ease-in-out;
-#         }}
-        
-#         @keyframes fadeIn {{
-#             from {{ opacity: 0; transform: translateY(20px); }}
-#             to {{ opacity: 1; transform: translateY(0); }}
-#         }}
-        
-#         .login-button {{
-#             font-size: 20px;
-#             padding: 15px 35px;
-#             background: linear-gradient(90deg, #28a745, #218838);
-#             color: white !important; 
-#             border-radius: 10px;
-#             text-decoration: none !important;
-#             font-weight: bold;
-#             transition: transform 0.2s, box-shadow 0.2s;
-#         }}
-        
-#         .login-button:hover {{
-#             transform: translateY(-3px);
-#             box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
-#             color: white !important; 
-#         }}
-        
-#         .hero-title {{ 
-#             font-size: 3rem; 
-#             font-weight: 700; 
-#             margin-bottom: 15px; 
-#         }}
-        
-#         .hero-subtitle {{ 
-#             font-size: 1.5rem; 
-#             margin-bottom: 20px; 
-#         }}
-#         </style>
-
-#         <!-- NEW TOP HEADING -->
-#         <div class="top-heading">National Institute of Health and Care Research</div>
-#         <div class="hero-title">🔐 Patient Engagement in Clinical Development🧑‍⚕️</div>
-#         <div class="hero-subtitle">PECD Public Partner Search Tool</div>
-#             <a href="{auth_url}" class="login-button">Sign In</a>
-
-#         <div class="login-container">
-            
-#         </div>
-#         """,
-#         unsafe_allow_html=True
-#     )
-#     st.stop()
-
 # -----------------------------
 # Sign Out Function
 # -----------------------------
@@ -290,21 +176,51 @@ if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
+# Top-right Sign Out Button (Fixed Position)
 # -----------------------------
-# Top-right Sign Out Button
-# -----------------------------
+
+# Hidden button trigger
+signout_clicked = st.session_state.get("signout_clicked", False)
+
+# CSS + HTML fixed-position button
 st.markdown(
-    f"""
-    <div style='position: fixed; top: 10px; right: 10px; z-index: 1000;'>
-        <a href="#" onclick="window.location.reload();" 
-           style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
-           Sign Out
-        </a>
+    """
+    <style>
+        .top-right-signout {
+            position: fixed;
+            top: 10px;
+            right: 12px;
+            z-index: 9999;
+        }
+        .top-right-signout button {
+            background-color: #FF4B4B !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 15px !important;
+            border-radius: 8px !important;
+            font-size: 15px !important;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .top-right-signout button:hover {
+            opacity: 0.85;
+        }
+    </style>
+
+    <div class="top-right-signout">
+        <form action="" method="post">
+            <button name="signout" type="submit">Sign Out</button>
+        </form>
     </div>
     """,
     unsafe_allow_html=True
 )
-if st.button("Sign Out"):
+
+# Detect form submission
+if st.query_params.get("signout") == ["true"]:
+    st.session_state["signout_clicked"] = True
+
+if st.session_state.get("signout_clicked"):
     sign_out()
 
 # --------------------------------
@@ -734,6 +650,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
