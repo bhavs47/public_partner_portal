@@ -83,27 +83,27 @@ def show_login_page():
     )
 
     # Top-left University of Leeds
-st.markdown(
+    st.markdown(
     """
     <div style='position:absolute; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; line-height:1.2;'>
         University<br>of Leeds
     </div>
     """,
     unsafe_allow_html=True
-)
+    )
 
-# Centered heading
-st.markdown(
+    # Centered heading
+    st.markdown(
     """
     <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
         Public Partner Search Tool
     </h1>
     """,
     unsafe_allow_html=True
-)
+    )
 
-# Centered sign-in button
-st.markdown(
+    # Centered sign-in button
+    st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
         <a href="{auth_url}"
@@ -625,6 +625,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
