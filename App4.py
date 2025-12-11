@@ -164,19 +164,25 @@ if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-# Top-right Sign Out button using CSS
+# Top-right Sign Out as HTML button
 # -------------------------
+sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
+
 st.markdown(
-    f"""
-    <div style='position:right; top:10px; right:10px; z-index:1000;'>
+    """
+    <div style='position: fixed; top: 10px; right: 10px; z-index: 1000;'>
+        <a href="#" onclick="window.location.reload();" 
+            style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
+            Sign Out
+        </a>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# Use Streamlit native button for functionality
-if st.button("Sign Out"):
+if sign_out_clicked:
     sign_out()
+
 
 
 # Ensure token_result and claims exist
@@ -618,6 +624,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
