@@ -130,28 +130,7 @@ def show_login_page():
     </style>
     """,
     unsafe_allow_html=True
-)
-
-# Display login container
-st.markdown(
-    f"""
-    <div class="login-container">
-        <h1>🔒 Patient Engagement in Clinical Development 🧑‍⚕️💬</h1>
-        <h2>Public Partner Search Tool</h2>
-        <a href="{auth_url}" style="
-            font-size:20px; 
-            padding:10px 20px;
-            background:#2F80ED; 
-            color:white; 
-            border-radius:8px; 
-            text-decoration:none;">
-            Sign in with Microsoft
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
- 
+    )
     st.stop()
 
 
@@ -627,6 +606,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
