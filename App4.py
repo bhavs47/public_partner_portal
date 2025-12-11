@@ -121,9 +121,9 @@ def show_login_page():
 
         <!-- NEW TOP HEADING -->
         <div class="top-heading">National Institute of Health and Care Research</div>
+        <div class="hero-title">🔐 Patient Engagement in Clinical Development🧑‍⚕️</div>
 
         <div class="login-container">
-            <div class="hero-title">🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬</div>
             <div class="hero-subtitle">PECD Public Partner Search Tool</div>
             <a href="{auth_url}" class="login-button">Sign In</a>
         </div>
@@ -619,6 +619,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
