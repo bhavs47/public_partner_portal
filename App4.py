@@ -55,7 +55,7 @@ def show_login_page():
         f"""
         <style>
         .stApp {{
-            background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+            background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/NIHR.png");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -735,6 +735,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
