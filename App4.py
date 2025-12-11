@@ -104,6 +104,29 @@ def show_login_page():
     """,
     unsafe_allow_html=True
     )
+
+    st.markdown(
+    """
+    <style>
+    /* Full page background */
+    body {
+        background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/University_of_Leeds_logo.svg/1200px-University_of_Leeds_logo.svg.png');
+        background-size: cover;        /* Cover entire page */
+        background-repeat: no-repeat;  /* Do not repeat */
+        background-attachment: fixed;  /* Stay fixed when scrolling */
+        background-position: center;   /* Center the image */
+    }
+
+    /* Optional: Make Streamlit content slightly transparent so background shows through */
+    .stApp {
+        background-color: rgba(255, 255, 255, 0.85); 
+        padding: 2rem;
+        border-radius: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
   
     st.stop()
 
@@ -580,6 +603,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
