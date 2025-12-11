@@ -73,65 +73,180 @@ def show_login_page():
             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
             letter-spacing: 1px;
         }}
-        
+
         .login-container {{
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 90vh;
+            height: 80vh;
             text-align: center;
             color: white;
             animation: fadeIn 1.5s ease-in-out;
+            margin-top: -20px;
         }}
-        
+
         @keyframes fadeIn {{
             from {{ opacity: 0; transform: translateY(20px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
-        
+
         .login-button {{
             font-size: 20px;
             padding: 15px 35px;
             background: linear-gradient(90deg, #28a745, #218838);
-            color: white !important; 
+            color: white !important;
             border-radius: 10px;
             text-decoration: none !important;
             font-weight: bold;
             transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
         }}
-        
+
         .login-button:hover {{
             transform: translateY(-3px);
             box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
-            color: white !important; 
+            color: white !important;
         }}
-        
-        .hero-title {{ 
-            font-size: 3rem; 
-            font-weight: 700; 
-            margin-bottom: 15px; 
+
+        .hero-title {{
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
         }}
-        
-        .hero-subtitle {{ 
-            font-size: 1.5rem; 
-            margin-bottom: 20px; 
+
+        .hero-subtitle {{
+            font-size: 1.5rem;
+            margin-bottom: 15px;
         }}
         </style>
 
-        <!-- NEW TOP HEADING -->
+        <!-- TOP HEADING -->
         <div class="top-heading">National Institute of Health and Care Research</div>
-        <div class="hero-title">🔐 Patient Engagement in Clinical Development🧑‍⚕️</div>
-        <div class="hero-subtitle">PECD Public Partner Search Tool</div>
-            <a href="{auth_url}" class="login-button">Sign In</a>
 
+        <!-- CENTERED CONTENT CONTAINER -->
         <div class="login-container">
-            
+            <div class="hero-title">🔐 Patient Engagement in Clinical Development 🧑‍⚕️</div>
+            <div class="hero-subtitle">PECD Public Partner Search Tool</div>
+            <a href="{auth_url}" class="login-button">Sign In</a>
         </div>
         """,
         unsafe_allow_html=True
     )
     st.stop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# query_params = st.experimental_get_query_params()
+
+# # -----------------------------
+# # Landing Page / Login
+# # -----------------------------
+# def show_login_page():
+#     auth_url = msal_app.get_authorization_request_url(
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI,
+#         state=str(uuid.uuid4()),
+#         prompt="select_account"
+#     )
+
+#     st.markdown(
+#         f"""
+#         <style>
+#         .stApp {{
+#             background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+#             background-size: cover;
+#             background-position: center;
+#             background-attachment: fixed;
+#             filter: brightness(0.7);
+#         }}
+
+#         /* MAIN TOP HEADING */
+#         .top-heading {{
+#             width: 100%;
+#             text-align: center;
+#             font-size: 3.2rem;
+#             font-weight: 800;
+#             margin-top: 40px;
+#             color: white;
+#             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+#             letter-spacing: 1px;
+#         }}
+        
+#         .login-container {{
+#             display: flex;
+#             flex-direction: column;
+#             justify-content: center;
+#             align-items: center;
+#             height: 90vh;
+#             text-align: center;
+#             color: white;
+#             animation: fadeIn 1.5s ease-in-out;
+#         }}
+        
+#         @keyframes fadeIn {{
+#             from {{ opacity: 0; transform: translateY(20px); }}
+#             to {{ opacity: 1; transform: translateY(0); }}
+#         }}
+        
+#         .login-button {{
+#             font-size: 20px;
+#             padding: 15px 35px;
+#             background: linear-gradient(90deg, #28a745, #218838);
+#             color: white !important; 
+#             border-radius: 10px;
+#             text-decoration: none !important;
+#             font-weight: bold;
+#             transition: transform 0.2s, box-shadow 0.2s;
+#         }}
+        
+#         .login-button:hover {{
+#             transform: translateY(-3px);
+#             box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+#             color: white !important; 
+#         }}
+        
+#         .hero-title {{ 
+#             font-size: 3rem; 
+#             font-weight: 700; 
+#             margin-bottom: 15px; 
+#         }}
+        
+#         .hero-subtitle {{ 
+#             font-size: 1.5rem; 
+#             margin-bottom: 20px; 
+#         }}
+#         </style>
+
+#         <!-- NEW TOP HEADING -->
+#         <div class="top-heading">National Institute of Health and Care Research</div>
+#         <div class="hero-title">🔐 Patient Engagement in Clinical Development🧑‍⚕️</div>
+#         <div class="hero-subtitle">PECD Public Partner Search Tool</div>
+#             <a href="{auth_url}" class="login-button">Sign In</a>
+
+#         <div class="login-container">
+            
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+#     st.stop()
 
 # -----------------------------
 # Sign Out Function
@@ -620,6 +735,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
