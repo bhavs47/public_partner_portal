@@ -103,6 +103,9 @@ def show_login_page():
     </div>
     """,
     unsafe_allow_html=True
+    )
+
+    #---- Background Image - University of Leeds ------------------
     st.markdown(
     f"""
     <style>
@@ -607,6 +610,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
