@@ -98,7 +98,7 @@ def show_login_page():
                 border-radius:8px;
                 text-decoration:none;
             ">
-            Sign in with Microsoft
+            Sign In
         </a>
     </div>
     """,
@@ -606,6 +606,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
