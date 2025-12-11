@@ -69,7 +69,7 @@ def show_login_page():
     st.markdown(
         """
         <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Research Care <br>
+            National Institue of Health and Research Care <br> <br>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
         """,
@@ -637,6 +637,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
