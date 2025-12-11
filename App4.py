@@ -37,7 +37,7 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 
 # -----------------------------
 # Landing Page / Login
@@ -641,6 +641,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
