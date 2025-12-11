@@ -50,37 +50,13 @@ def show_login_page():
         state=str(uuid.uuid4()),
         prompt="select_account"
     )
-    # st.markdown(
-    #     f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-    #     f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-    #     f'Sign in with Microsoft</a>',
-    #     unsafe_allow_html=True
-    # )
-
     st.markdown(
-    f"""
-    <script>
-        function goToLogin() {{
-            window.location.href = "{auth_url}";
-        }}
-    </script>
-
-    <button onclick="goToLogin()" 
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#2F80ED;
-                color:white;
-                border-radius:8px;
-                border:none;
-                cursor:pointer;">
-        Sign in with Microsoft
-    </button>
-    """,
-    unsafe_allow_html=True
-)
-
-st.stop()
+        f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
+        f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
+        f'Sign in with Microsoft</a>',
+        unsafe_allow_html=True
+    )
+    st.stop()
 
 
 if "token_result" not in st.session_state:
@@ -555,6 +531,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
