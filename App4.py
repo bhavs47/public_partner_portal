@@ -140,20 +140,9 @@ def show_login_page():
 # Sign Out
 # -----------------------------
 def sign_out():
-    for key in ["token_result", "user_email", "user_name", "logout_request"]:
+    for key in ["token_result", "user_email", "user_name"]:
         st.session_state.pop(key, None)
     st.experimental_rerun()
-
-if "logout_request" not in st.session_state:
-    st.session_state["logout_request"] = False
-
-if query_params.get("signout") == ["true"] or st.session_state.get("logout_request", False):
-    sign_out()
-
-with st.form("logout_form"):
-    submitted = st.form_submit_button("Log Out")
-    if submitted:
-        st.session_state["logout_request"] = True
 
 # -----------------------------
 # Handle Authentication
@@ -225,6 +214,10 @@ st.html("""
     </div>
 """)
 
+
+if query_params.get("signout") == ["true"]:
+    sign_out()
+        
 # # Handle actual logout action
 # if st.query_params.get("signout") == ["true"]:
 #     sign_out()
@@ -680,6 +673,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
