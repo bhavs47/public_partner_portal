@@ -186,7 +186,7 @@ st.markdown("""
     <style>
         div[data-testid="stToolbar"] {visibility: hidden;}
         div.stButton > button {
-            background-color: #FF4B4B;
+            background-color: #28a745;   /* ✅ GREEN */
             color: white;
             padding: 8px 16px;
             border-radius: 6px;
@@ -662,6 +662,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
