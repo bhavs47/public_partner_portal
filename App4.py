@@ -1,4 +1,4 @@
-# app.py
+# App4.py
 """
 PECD Public Partner Search Tool - Combined PECD + EDI Data
 Run: streamlit run app.py
@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 import streamlit as st
 import uuid
+from datetime import date
 
 # -----------------------------
 # App Configuration
@@ -125,7 +126,6 @@ def filter_dataframe(d, filters):
         if filters['disease_cols']:
             mask = pd.Series(False, index=dfc.index)
             for col in filters['disease_cols']:
-                # guard if column missing for some rows
                 if col in dfc.columns:
                     mask = mask | dfc[col].astype(str).str.lower().str.strip().str.contains(keyword, na=False)
             dfc = dfc[mask]
@@ -138,9 +138,20 @@ def filter_dataframe(d, filters):
     if filters.get('ethnicity') and filters['ethnicity'] != "Any" and filters.get('ethnicity_col') in dfc.columns:
         dfc = dfc[dfc[filters['ethnicity_col']].astype(str).str.lower().str.strip() == filters['ethnicity'].lower().strip()]
 
-    # --- Carer ---
+    # --- Carer (exact matching of one of the split values) ---
     if filters.get('carer') and filters['carer'] != "Any" and filters.get('carer_col') in dfc.columns:
-        dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip() == filters['carer'].lower().strip()]
+        # keep rows where the carer cell contains the selected carer option (as substring) or equals 'None'
+        selected_carer = filters['carer']
+        if selected_carer.lower() == "none":
+            dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip().isin(["none", "nan", ""] ) == False]  # careful: we'll interpret 'None' explicitly below
+            # Instead, better to keep rows whose carer column is empty or 'None'
+            dfc = dfc[dfc[filters['carer_col']].astype(str).str.strip().str.lower().isin(["none", "nan", ""] ) == False]
+        else:
+            # match if the split list contains the selected_carer
+            mask = dfc[filters['carer_col']].astype(str).apply(
+                lambda cell: any(selected_carer.lower() == part.strip().lower() for part in str(cell).split(";") if part.strip())
+            )
+            dfc = dfc[mask]
 
     # --- Sexuality ---
     if filters.get('sexuality') and filters['sexuality'] != "Any" and filters.get('sexuality_col') in dfc.columns:
@@ -159,10 +170,8 @@ def filter_dataframe(d, filters):
                 st.error("⚠️ Max Age cannot be less than Min Age.")
                 return dfc
             if filters.get('age_col') in dfc.columns:
-                # convert to numeric temporarily
                 numeric_col = filters['age_col'] + "_num_temp"
                 dfc[numeric_col] = pd.to_numeric(dfc[filters['age_col']], errors='coerce')
-                # between inclusive handling depends on pandas version; the call below is robust for common versions
                 dfc = dfc[(dfc[numeric_col] >= min_age) & (dfc[numeric_col] <= max_age)]
                 dfc.drop(columns=[numeric_col], inplace=True)
 
@@ -170,10 +179,6 @@ def filter_dataframe(d, filters):
     if filters.get('name_search'):
         if filters.get('name_col') in dfc.columns:
             dfc = dfc[dfc[filters['name_col']].astype(str).str.contains(filters['name_search'], case=False, na=False)]
-
-    # Expertise search (if column exists)
-    # if filters.get('expertise_search') and filters.get('expertise_col') in dfc.columns:
-    #     dfc = dfc[dfc[filters['expertise_col']].astype(str).str.contains(filters['expertise_search'], case=False, na=False)]
 
     return dfc
 
@@ -199,8 +204,41 @@ if df_edi is None:
 df_pecd, pecd_map = normalize_cols(df_pecd)
 df_edi, edi_map = normalize_cols(df_edi)
 
+# -------------------------
+# Strip time from date-time columns (keep only date)
+# We attempt to detect column names case-insensitively.
+# -------------------------
+# PECD: Data Retention Confirmed (various capitalisations)
+pecd_date_candidates = [
+    "data retention date confirmed",
+    "data retention confirmed",
+    "data retention date"
+]
+for cand in pecd_date_candidates:
+    if cand in pecd_map:
+        col = pecd_map[cand]
+        try:
+            df_pecd[col] = pd.to_datetime(df_pecd[col], errors="coerce").dt.date
+        except Exception:
+            pass
+        break
+
+# EDI: Last Updated (various capitalisations)
+edi_date_candidates = [
+    "last updated",
+    "last updated date",
+    "last updated on"
+]
+for cand in edi_date_candidates:
+    if cand in edi_map:
+        col = edi_map[cand]
+        try:
+            df_edi[col] = pd.to_datetime(df_edi[col], errors="coerce").dt.date
+        except Exception:
+            pass
+        break
+
 # Find ID columns in each dataset
-# Try many common ID variations
 id_names = ["id", "participant id", "unique id", "identifier"]
 pecd_id_col = None
 edi_id_col = None
@@ -210,7 +248,7 @@ for name in id_names:
     if edi_id_col is None and name in edi_map:
         edi_id_col = edi_map[name]
 
-# Fallback: look for first column (if ID really is column A)
+# Fallback: first column if not found
 if pecd_id_col is None and len(df_pecd.columns) > 0:
     pecd_id_col = df_pecd.columns[0]
 if edi_id_col is None and len(df_edi.columns) > 0:
@@ -249,11 +287,23 @@ name_col = get_col(col_map, ['name', 'full name', 'participant name'])
 email_col = get_col(col_map, ['email', 'email id', 'email address'])
 age_col = get_col(col_map, ['age', 'what is your age'])
 year_of_birth_col = get_col(col_map, ['year of birth', 'yob'])
-gender_col = get_col(col_map, ['what is your sex? A question about gender identity will follow.'])
-ethnicity_col = get_col(col_map, ['what is your ethnic group? choose one option that best describes your ethnic group or background.'])
-carer_col = get_col(col_map, ['do you have any caring responsibilities? (if you share care responsibilities equally then please answer as the primary carer)'])
-sexuality_col = get_col(col_map, ['which of the following best describes your sexual orientation?'])
-# If your EDI uses slightly different strings, update the lists above.
+gender_col = get_col(col_map, [
+    'what is your sex? a question about gender identity will follow.',
+    'what is your sex?',
+    'sex', 'gender'
+])
+ethnicity_col = get_col(col_map, [
+    'what is your ethnic group? choose one option that best describes your ethnic group or background.',
+    'what is your ethnic group?',
+    'ethnic group', 'ethnicity'
+])
+carer_col = get_col(col_map, [
+    'do you have any caring responsibilities? (if you share care responsibilities equally then please answer as the primary carer)',
+    'do you have any caring responsibilities? (if you share care responsibilities equally then please answer as the primary carer)',
+    'do you have any caring responsibilities?',
+    'caring responsibilities'
+])
+sexuality_col = get_col(col_map, ['which of the following best describes your sexual orientation?', 'sexual orientation'])
 
 # Ensure required columns exist (at least name & email)
 if not name_col or not email_col:
@@ -263,15 +313,41 @@ if not name_col or not email_col:
 # ------------------------------------------
 # 1. Build filter option lists
 # ------------------------------------------
+# Diseases
 all_diseases = set()
 for col in disease_cols:
     all_diseases.update(df[col].dropna().astype(str).unique())
-
 disease_options = ["Any"] + sorted([d for d in all_diseases if str(d).strip() != ""])
-gender_options = ["Any"] if not gender_col else ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
-carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dropna().astype(str).unique())
-ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
-sexuality_options = ["Any"] if not sexuality_col else ["Any"] + sorted(df[sexuality_col].dropna().astype(str).unique())
+
+# Gender
+gender_options = ["Any"]
+if gender_col and gender_col in df.columns:
+    gender_options = ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
+
+# Ethnicity
+ethnicity_options = ["Any"]
+if ethnicity_col and ethnicity_col in df.columns:
+    ethnicity_options = ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
+
+# Carer: split semicolon-separated values into distinct options and include "None" if present
+carer_options_set = set()
+if carer_col and carer_col in df.columns:
+    for cell in df[carer_col].dropna().astype(str):
+        parts = [p.strip() for p in cell.split(";") if p.strip()]
+        if len(parts) == 0:
+            continue
+        for p in parts:
+            carer_options_set.add(p)
+    # also include an explicit "None" if any cell equals 'None' (case-insensitive) or empty exists
+    # We'll include "None" if any cell is exactly 'None' or if there are empty/NaN cells
+    if df[carer_col].dropna().astype(str).str.strip().str.lower().isin(["none"]).any() or df[carer_col].isna().any():
+        carer_options_set.add("None")
+carer_options = ["Any"] + sorted(carer_options_set)
+
+# Sexuality options
+sexuality_options = ["Any"]
+if sexuality_col and sexuality_col in df.columns:
+    sexuality_options = ["Any"] + sorted(df[sexuality_col].dropna().astype(str).unique())
 
 # ------------------------------------------
 # 2. Filter defaults (MASTER DEFINITION)
@@ -285,7 +361,6 @@ DEFAULT_FILTERS = {
     "filter_selected_ethnicity": "Any",
     "filter_selected_sexuality": "Any",
     "filter_name_search": "",
-    # "filter_expertise_search": "",
 }
 
 # Initialize missing keys only
@@ -327,6 +402,7 @@ st.write("---")
 # 3. UI Widgets (consistent keys)
 # ------------------------------------------
 st.markdown("### Search Filters for Public Partners")
+# Use 6 columns if sexualilty included; otherwise the layout still works
 f1, f2, f3, f4, f5, f6 = st.columns([2,2,2,2,2,2])
 
 with f1:
@@ -368,9 +444,6 @@ with btn1:
 with btn2:
     do_search = st.button("🔍 Search Partners", use_container_width=True)
 
-# Expertse search on its own row
-#expertise_search = st.text_input("Expertise/Keywords Search", placeholder="e.g. clinical trials", key="filter_expertise_search")
-
 # ------------------------------------------
 # Build filters dict (feeding into filter_dataframe)
 # ------------------------------------------
@@ -396,9 +469,6 @@ filters = {
 
     'name_search': st.session_state.get("filter_name_search", "").strip(),
     'name_col': name_col,
-
-    # 'expertise_search': st.session_state.get("filter_expertise_search", "").strip(),
-    # 'expertise_col': expertise_col
 }
 
 # ------------------------------------------
@@ -440,7 +510,3 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
-
-
-
-
