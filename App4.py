@@ -170,7 +170,7 @@ sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibilit
 
 st.markdown(
     """
-    <div style='position: fixed; top: 10px; right: 10px; z-index: 1000;'>
+    <div style='position: fixed; top: 10px; right: 100px; z-index: 1000;'>
         <a href="#" onclick="window.location.reload();" 
             style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
             Sign Out
@@ -624,6 +624,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
