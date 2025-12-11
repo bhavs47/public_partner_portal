@@ -110,7 +110,7 @@ def show_login_page():
     <style>
     /* Full page background */
     body {
-        background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/University_of_Leeds_logo.svg/1200px-University_of_Leeds_logo.svg.png');
+        background-image: url('https://www.shutterstock.com/image-photo/leeds-yorkshire-united-kingdom-june-16th-2168850029?trackingId=cf2751f9-d1b6-4706-b33c-20a236914df6');
         background-size: cover;        /* Cover entire page */
         background-repeat: no-repeat;  /* Do not repeat */
         background-attachment: fixed;  /* Stay fixed when scrolling */
@@ -603,6 +603,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
