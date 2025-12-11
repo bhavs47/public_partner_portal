@@ -36,21 +36,20 @@ msal_app = ConfidentialClientApplication(
 )
 
 # -----------------------------
-# Prevent re-redeeming the code (store token_result in session_state)
-# -----------------------------
-query_params = st.experimental_get_query_params()
-
+# Function to show login page
+# -------------------------
 def show_login_page():
     st.markdown(
         """
         <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Care Research <br> <br>
+            National Institute of Health and Care Research <br> <br>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
         """,
         unsafe_allow_html=True
     )
 
+    # Generate auth URL
     auth_url = msal_app.get_authorization_request_url(
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
@@ -58,69 +57,61 @@ def show_login_page():
         prompt="select_account"
     )
 
-   # Centered heading and subheading
+    # Centered heading
     st.markdown(
-    """
-    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
-        Public Partner Search Tool
-    </h1>
-    """,
-    unsafe_allow_html=True
+        """
+        <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
+            Public Partner Search Tool
+        </h1>
+        """,
+        unsafe_allow_html=True
     )
 
-    # Centered sign-in button
+    # Centered Sign In button
     st.markdown(
-    f"""
-    <div style='text-align:center; margin-top:20px;'>
-        <a href="{auth_url}"
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#28a745;
-                color:white;
-                border-radius:8px;
-                text-decoration:none;
-            ">
-            Sign In
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True
+        f"""
+        <div style='text-align:center; margin-top:20px;'>
+            <a href="{auth_url}"
+                style="
+                    font-size:20px;
+                    padding:10px 20px;
+                    background:#28a745;
+                    color:white;
+                    border-radius:8px;
+                    text-decoration:none;
+                ">
+                Sign In
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
-
-
-    #---- Background Image - University of Leeds ------------------
+    # Background image
     st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        filter: brightness(0.7); /* optional darkening */
-    }
-
-    .login-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        text-align: center;
-        color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+        """
+        <style>
+        .stApp {{
+            background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.7);
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
     )
+
     st.stop()
 
+
+# -------------------------
 # Function to sign out
+# -------------------------
 def sign_out():
-    for key in ["token_result", "user_name"]:
+    for key in ["token_result", "user_name", "user_email"]:
         if key in st.session_state:
             st.session_state.pop(key)
     st.experimental_rerun()
@@ -131,11 +122,12 @@ def sign_out():
 # -------------------------
 query_params = st.experimental_get_query_params()
 
+# Redeem code if token not in session
 if "token_result" not in st.session_state:
     if "code" not in query_params:
         show_login_page()
 
-    # Redeem code
+    # Acquire token using MSAL
     code = query_params["code"][0]
     token_result = msal_app.acquire_token_by_authorization_code(
         code=code,
@@ -155,35 +147,38 @@ if (
     st.session_state.pop("token_result", None)
     show_login_page()
 
-# Get user's name
+# Extract user claims
 claims = token_result.get("id_token_claims", {})
-name = claims.get("name") or claims.get("preferred_username") or "User"
-st.session_state["user_name"] = name
 
-# Restrict access
-if name not in ALLOWED_EMAILS:
+# Use email for permission check
+email = claims.get("preferred_username")
+st.session_state["user_email"] = email
+
+if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
+# Use full name for display
+name = claims.get("name") or email
+st.session_state["user_name"] = name
 
 # -------------------------
-# Top-right Sign Out as HTML button
+# Top-right Sign Out button
 # -------------------------
-sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
-
 st.markdown(
-    """
+    f"""
     <div style='position: fixed; top: 10px; right: 10px; z-index: 1000;'>
-        <a href="#" onclick="window.location.reload();" 
-            style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
+        <button onclick="window.location.reload();" 
+            style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border:none; border-radius:5px; cursor:pointer;'>
             Sign Out
-        </a>
+        </button>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-if sign_out_clicked:
+# Fallback Streamlit button to actually clear session
+if st.button("Sign Out"):
     sign_out()
 
 
@@ -193,9 +188,7 @@ claims = token_result.get("id_token_claims", {})
 
 # Get user's name, fallback to email or "User"
 name = claims.get("name") or claims.get("preferred_username") or "User"
-
 st.session_state["user_name"] = name
-
 st.write(f"Welcome, {name}!")
 
 
@@ -627,6 +620,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
