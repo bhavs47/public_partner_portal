@@ -84,30 +84,38 @@ def show_login_page():
 
     st.markdown(
     f"""
-    <div style='position:fixed; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; z-index:9999; line-height:1.2; background: rgba(0,0,0,0);'>
-        University<br>of Leeds
-    </div>
+    <div style='position: relative; width: 100%; height: 100vh;'>
 
-    <h1 style='text-align:center; margin-bottom:20px; color:white;'>
-        Public Partner Search Tool
-    </h1>
+        <!-- Top-left University text -->
+        <div style='position: absolute; top: 20px; left: 20px; color: white; font-size: 18px; font-weight: bold; line-height: 1.2;'>
+            University<br>of Leeds
+        </div>
 
-    <div style='text-align:center; margin-top:20px;'>
-        <a href="{auth_url}"
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#28a745;  /* green button */
-                color:white;
-                border-radius:8px;
-                text-decoration:none;
-            ">
-            Sign in with Microsoft
-        </a>
+        <!-- Centered main heading -->
+        <h1 style='text-align:center; margin-top: 150px; margin-bottom:20px; color:white;'>
+            Public Partner Search Tool
+        </h1>
+
+        <!-- Centered button -->
+        <div style='text-align:center; margin-top:20px;'>
+            <a href="{auth_url}"
+                style="
+                    font-size:20px;
+                    padding:10px 20px;
+                    background:#28a745;  /* green button */
+                    color:white;
+                    border-radius:8px;
+                    text-decoration:none;
+                ">
+                Sign In
+            </a>
+        </div>
+
     </div>
     """,
     unsafe_allow_html=True
-    )
+)
+
 
     #---- Background Image - University of Leeds ------------------
     st.markdown(
@@ -610,6 +618,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
