@@ -40,36 +40,11 @@ msal_app = ConfidentialClientApplication(
 # -----------------------------
 query_params = st.experimental_get_query_params()
 
-# Check token validity and detect expiration
-# -------------------------------------------------------
-# def show_login_page():
-#     # st.title("🔐 PECD")
-#      st.markdown(
-#         """
-#         <h1 style='text-align:center;'>
-#             🔐 PECD
-#         </h1>
-#         """,
-#         unsafe_allow_html=True
-#     )
-#     auth_url = msal_app.get_authorization_request_url(
-#         scopes=SCOPE,
-#         redirect_uri=REDIRECT_URI,
-#         state=str(uuid.uuid4()),
-#         prompt="select_account"
-#     )
-    # st.markdown(
-    #     f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
-    #     f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
-    #     f'Sign in with Microsoft</a>',
-    #     unsafe_allow_html=True
-    # )
-
 def show_login_page():
     st.markdown(
         """
         <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Research Care <br> <br>
+            National Institue of Health and Care Research <br> <br>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
         """,
@@ -142,6 +117,15 @@ def show_login_page():
     unsafe_allow_html=True
     )
     st.stop()
+
+# Function to sign out
+# -------------------------
+def sign_out():
+    if "token_result" in st.session_state:
+        st.session_state.pop("token_result")
+    if "user_email" in st.session_state:
+        st.session_state.pop("user_email")
+    st.experimental_rerun()  # reload the app to show login page
 
 
 if "token_result" not in st.session_state:
@@ -607,6 +591,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
