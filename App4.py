@@ -82,44 +82,75 @@ def show_login_page():
         prompt="select_account"
     )
 
+   # Apply background image and dark overlay
+    st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        filter: brightness(0.7); /* optional darkening */
+        height: 100vh;
+        width: 100%;
+    }
+
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        text-align: center;
+    }
+
+    .top-left {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+
+    .sign-in-button {
+        font-size: 20px;
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+    )
+
     # Top-left University of Leeds
     st.markdown(
-    """
-    <div style='position:absolute; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; line-height:1.2;'>
-        University<br>of Leeds
-    </div>
-    """,
-    unsafe_allow_html=True
+        """
+        <div class="top-left">
+            University<br>of Leeds
+        </div>
+        """,
+        unsafe_allow_html=True
     )
-
-    # Centered heading
+    
+    # Centered heading and subheading
     st.markdown(
-    """
-    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
-        Public Partner Search Tool
-    </h1>
-    """,
-    unsafe_allow_html=True
-    )
-
-    # Centered sign-in button
-    st.markdown(
-    f"""
-    <div style='text-align:center; margin-top:20px;'>
-        <a href="{auth_url}"
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#28a745;
-                color:white;
-                border-radius:8px;
-                text-decoration:none;
-            ">
-            Sign in with Microsoft
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True
+        """
+        <div class="login-container">
+            <h2>🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬</h2>
+            <h1>Public Partner Search Tool</h1>
+            <a href="#" class="sign-in-button">Sign In</a>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
 
@@ -625,6 +656,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
