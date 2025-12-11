@@ -68,7 +68,7 @@ query_params = st.experimental_get_query_params()
 def show_login_page():
     st.markdown(
         """
-        <h1 style='text-align:center;'>
+        <h1 style='text-align:center; color:white;'>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
         """,
@@ -83,6 +83,11 @@ def show_login_page():
     )
 
     st.markdown(
+    f"""
+    <div style='position:fixed; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; z-index:1000; line-height:1.2;'>
+        University<br>of Leeds
+    </div>
+    
     f"""
     <h1 style='text-align:center; margin-bottom:20px; color:white;'>
         Public Partner Search Tool
@@ -606,6 +611,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
