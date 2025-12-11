@@ -51,6 +51,11 @@ def show_login_page():
         prompt="select_account"
     )
     st.markdown(
+        """
+    <h1 style='text-align:center; margin-bottom: 0px;'>
+        PECD Public Partner Search Tool
+    </h1>
+    """,
         f'<a href="{auth_url}" style="font-size:20px; padding:10px 20px; '
         f'background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">'
         f'Sign in with Microsoft</a>',
@@ -531,6 +536,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
