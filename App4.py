@@ -35,88 +35,191 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-# -----------------------------
-# Prevent re-redeeming the code (store token_result in session_state)
-# -----------------------------
-query_params = st.experimental_get_query_params()
-
 def show_login_page():
     st.markdown(
         """
-        <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Care Research <br> <br>
-            🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
-        </h1>
-        """,
+        <style>
+        /* Full-page background */
+        .stApp {
+            background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.7);
+        }
+
+        /* Centered container */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            text-align: center;
+            color: white;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Button styling */
+        .login-button {
+            font-size: 20px;
+            padding: 15px 35px;
+            background: linear-gradient(90deg, #28a745, #218838);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Hero text */
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        </style>
+
+        <div class="login-container">
+            <div class="hero-title">PECD Public Partner Search Tool</div>
+            <div class="hero-subtitle">🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬</div>
+            <a href="{auth_url}" class="login-button">Sign In</a>
+        </div>
+        """.format(
+            auth_url=msal_app.get_authorization_request_url(
+                scopes=SCOPE,
+                redirect_uri=REDIRECT_URI,
+                state=str(uuid.uuid4()),
+                prompt="select_account"
+            )
+        ),
         unsafe_allow_html=True
     )
-
-    auth_url = msal_app.get_authorization_request_url(
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI,
-        state=str(uuid.uuid4()),
-        prompt="select_account"
-    )
-
-   # Centered heading and subheading
-    st.markdown(
-    """
-    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
-        Public Partner Search Tool
-    </h1>
-    """,
-    unsafe_allow_html=True
-    )
-
-    # Centered sign-in button
-    st.markdown(
-    f"""
-    <div style='text-align:center; margin-top:20px;'>
-        <a href="{auth_url}"
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#28a745;
-                color:white;
-                border-radius:8px;
-                text-decoration:none;
-            ">
-            Sign In
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True
-    )
-
-
-
-    #---- Background Image - University of Leeds ------------------
-    st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        filter: brightness(0.7); /* optional darkening */
-    }
-
-    .login-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        text-align: center;
-        color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-    )
     st.stop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -----------------------------
+# Prevent re-redeeming the code (store token_result in session_state)
+# -----------------------------
+# query_params = st.experimental_get_query_params()
+
+# def show_login_page():
+#     st.markdown(
+#         """
+#         <h1 style='text-align:center; color:white;'>
+#             National Institue of Health and Care Research <br> <br>
+#             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
+#         </h1>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+#     auth_url = msal_app.get_authorization_request_url(
+#         scopes=SCOPE,
+#         redirect_uri=REDIRECT_URI,
+#         state=str(uuid.uuid4()),
+#         prompt="select_account"
+#     )
+
+#    # Centered heading and subheading
+#     st.markdown(
+#     """
+#     <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
+#         Public Partner Search Tool
+#     </h1>
+#     """,
+#     unsafe_allow_html=True
+#     )
+
+#     # Centered sign-in button
+#     st.markdown(
+#     f"""
+#     <div style='text-align:center; margin-top:20px;'>
+#         <a href="{auth_url}"
+#             style="
+#                 font-size:20px;
+#                 padding:10px 20px;
+#                 background:#28a745;
+#                 color:white;
+#                 border-radius:8px;
+#                 text-decoration:none;
+#             ">
+#             Sign In
+#         </a>
+#     </div>
+#     """,
+#     unsafe_allow_html=True
+#     )
+
+
+
+#     #---- Background Image - University of Leeds ------------------
+#     st.markdown(
+#     """
+#     <style>
+#     .stApp {
+#         background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
+#         background-size: cover;
+#         background-position: center;
+#         background-repeat: no-repeat;
+#         background-attachment: fixed;
+#         filter: brightness(0.7); /* optional darkening */
+#     }
+
+#     .login-container {
+#         display: flex;
+#         flex-direction: column;
+#         justify-content: center;
+#         align-items: center;
+#         height: 80vh;
+#         text-align: center;
+#         color: white;
+#     }
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+#     )
+#     st.stop()
 
 # Function to sign out
 # -------------------------
@@ -624,6 +727,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
