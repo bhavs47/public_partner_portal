@@ -105,29 +105,30 @@ def show_login_page():
     unsafe_allow_html=True
     )
 
+#---- Background wallpaper- University of Leeds ----------------
     st.markdown(
-    """
+    f"""
     <style>
-    /* Full page background */
-    body {
-        background-image: url('https://www.shutterstock.com/image-photo/leeds-yorkshire-united-kingdom-june-16th-2168850029?trackingId=cf2751f9-d1b6-4706-b33c-20a236914df6');
-        background-size: cover;        /* Cover entire page */
-        background-repeat: no-repeat;  /* Do not repeat */
-        background-attachment: fixed;  /* Stay fixed when scrolling */
-        background-position: center;   /* Center the image */
-    }
+    /* Full page background via Streamlit container */
+    .stApp {{
+        background-image: url('https://www.leeds.ac.uk/site/custom_scripts/images/university-of-leeds-campus.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+    }}
 
-    /* Optional: Make Streamlit content slightly transparent so background shows through */
-    .stApp {
-        background-color: rgba(255, 255, 255, 0.85); 
-        padding: 2rem;
+    /* Optional: slightly transparent content to improve readability */
+    .css-1d391kg {{
+        background-color: rgba(255, 255, 255, 0.85);
         border-radius: 10px;
-    }
+        padding: 1rem;
+    }}
     </style>
     """,
     unsafe_allow_html=True
 )
-  
+ 
     st.stop()
 
 
@@ -603,6 +604,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
