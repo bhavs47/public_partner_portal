@@ -166,7 +166,7 @@ if email not in ALLOWED_EMAILS:
 
 # Top-right Sign Out as HTML button
 # -------------------------
-sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
+# sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
 
 st.markdown(
     """
@@ -624,6 +624,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
