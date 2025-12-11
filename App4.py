@@ -142,6 +142,10 @@ def filter_dataframe(d, filters):
     if filters.get('carer') and filters['carer'] != "Any" and filters.get('carer_col') in dfc.columns:
         dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip() == filters['carer'].lower().strip()]
 
+    # --- Sexuality ---
+    if filters.get('sexuality') and filters['sexuality'] != "Any" and filters.get('sexuality_col') in dfc.columns:
+        dfc = dfc[dfc[filters['sexuality_col']].astype(str).str.lower().str.strip() == filters['sexuality'].lower().strip()]
+
     # Age filter
     min_age = filters.get('min_age')
     max_age = filters.get('max_age')
@@ -248,7 +252,7 @@ year_of_birth_col = get_col(col_map, ['year of birth', 'yob'])
 gender_col = get_col(col_map, ['what is your sex? A question about gender identity will follow.'])
 ethnicity_col = get_col(col_map, ['what is your ethnic group? choose one option that best describes your ethnic group or background.'])
 carer_col = get_col(col_map, ['do you have any caring responsibilities? (if you share care responsibilities equally then please answer as the primary carer)'])
-# expertise_col = get_col(col_map, ['expertise', 'expertise/keywords', 'expertise keywords', 'expertise areas'])
+sexuality_col = get_col(col_map, ['which of the following best describes your sexual orientation?'])
 # If your EDI uses slightly different strings, update the lists above.
 
 # Ensure required columns exist (at least name & email)
@@ -267,6 +271,7 @@ disease_options = ["Any"] + sorted([d for d in all_diseases if str(d).strip() !=
 gender_options = ["Any"] if not gender_col else ["Any"] + sorted(df[gender_col].dropna().astype(str).unique())
 carer_options = ["Any"] if not carer_col else ["Any"] + sorted(df[carer_col].dropna().astype(str).unique())
 ethnicity_options = ["Any"] if not ethnicity_col else ["Any"] + sorted(df[ethnicity_col].dropna().astype(str).unique())
+sexuality_options = ["Any"] if not sexuality_col else ["Any"] + sorted(df[sexuality_col].dropna().astype(str).unique())
 
 # ------------------------------------------
 # 2. Filter defaults (MASTER DEFINITION)
@@ -377,6 +382,9 @@ filters = {
     'ethnicity': st.session_state.get("filter_selected_ethnicity", "Any"),
     'ethnicity_col': ethnicity_col,
 
+    'sexuality': st.session_state.get("filter_selected_sexuality", "Any"),
+    'sexuality_col': sexuality_col,
+
     'min_age': st.session_state.get("filter_min_age", 0),
     'max_age': st.session_state.get("filter_max_age", 120),
     'age_col': age_col,
@@ -427,5 +435,6 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
