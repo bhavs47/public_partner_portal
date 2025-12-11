@@ -84,7 +84,7 @@ def show_login_page():
 
     st.markdown(
     f"""
-    <div style='position:fixed; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; z-index:1000; line-height:1.2;'>
+    <div style='position:fixed; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; z-index:9999; line-height:1.2; background: rgba(0,0,0,0);'>
         University<br>of Leeds
     </div>
 
@@ -610,6 +610,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
