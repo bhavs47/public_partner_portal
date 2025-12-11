@@ -103,23 +103,33 @@ def show_login_page():
     </div>
     """,
     unsafe_allow_html=True
-    )
-
-#---- Background wallpaper- University of Leeds ----------------
     st.markdown(
     f"""
     <style>
     .stApp {{
         background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-        background-size: cover;
-        background-position: center;
+        background-size: cover;  /* fill without repeating */
+        background-position: center center; /* center properly */
         background-repeat: no-repeat;
-        background-attachment: fixed;
+        background-attachment: fixed; /* stay in place */
+        filter: brightness(0.7); /* optional: darken for better text contrast */
+    }}
+
+    /* Center the login content */
+    .login-container {{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;  /* center vertically */
+        text-align: center;
+        color: white; /* text color on background */
     }}
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
  
     st.stop()
@@ -597,6 +607,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
