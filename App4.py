@@ -87,8 +87,7 @@ def show_login_page():
     <div style='position:fixed; top:10px; left:10px; color:white; font-size:18px; font-weight:bold; z-index:1000; line-height:1.2;'>
         University<br>of Leeds
     </div>
-    
-    f"""
+
     <h1 style='text-align:center; margin-bottom:20px; color:white;'>
         Public Partner Search Tool
     </h1>
@@ -98,12 +97,12 @@ def show_login_page():
             style="
                 font-size:20px;
                 padding:10px 20px;
-                background:#28a745;
+                background:#28a745;  /* green button */
                 color:white;
                 border-radius:8px;
                 text-decoration:none;
             ">
-            Sign In
+            Sign in with Microsoft
         </a>
     </div>
     """,
@@ -611,6 +610,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
