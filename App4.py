@@ -185,32 +185,43 @@ if email not in ALLOWED_EMAILS:
 st.markdown("""
     <style>
         div[data-testid="stToolbar"] {visibility: hidden;}
-        div.stButton > button {
-            background-color: #28a745;   /* ✅ GREEN */
+
+        .signout-btn {
+            background-color: #28a745;
             color: white;
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 15px;
             border: none;
+            cursor: pointer;
         }
+
         .signout-container {
             position: fixed;
             top: 15px;
             right: 25px;
-            z-index: 999999;
+            z-index: 999999 !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Top-right button container
-st.markdown('<div class="signout-container">', unsafe_allow_html=True)
 
-if st.button("Sign Out"):
+# --- FIXED POSITION SIGN OUT BUTTON ---
+st.html("""
+    <div class="signout-container">
+        <button class="signout-btn" onclick="window.location.href='?signout=true'">
+            Sign Out
+        </button>
+    </div>
+""")
+
+# Handle actual logout action
+if st.query_params.get("signout") == ["true"]:
     for key in ["token_result", "user_name", "user_email"]:
         st.session_state.pop(key, None)
+    st.query_params.clear()
     st.experimental_rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # Detect logout via POST submit
 if st.session_state.get("logout_request") is None:
@@ -662,6 +673,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
