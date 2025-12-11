@@ -43,7 +43,15 @@ query_params = st.experimental_get_query_params()
 # Check token validity and detect expiration
 # -------------------------------------------------------
 def show_login_page():
-    st.title("🔐 Public Partner Portal Login")
+    # st.title("🔐 PECD")
+     st.markdown(
+        """
+        <h1 style='text-align:center;'>
+            🔐 PECD
+        </h1>
+        """,
+        unsafe_allow_html=True
+    )
     auth_url = msal_app.get_authorization_request_url(
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
@@ -556,6 +564,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
