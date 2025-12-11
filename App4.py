@@ -107,33 +107,43 @@ def show_login_page():
 
     #---- Background Image - University of Leeds ------------------
     st.markdown(
-    f"""
+    """
     <style>
-    .stApp {{
+    .stApp {
         background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-        background-size: cover;  /* fill without repeating */
-        background-position: center center; /* center properly */
+        background-size: cover;
+        background-position: center;
         background-repeat: no-repeat;
-        background-attachment: fixed; /* stay in place */
-        filter: brightness(0.7); /* optional: darken for better text contrast */
-    }}
+        background-attachment: fixed;
+        filter: brightness(0.7); /* optional darkening */
+    }
 
-    /* Center the login content */
-    .login-container {{
+    .login-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 80vh;  /* center vertically */
+        height: 80vh;
         text-align: center;
-        color: white; /* text color on background */
-    }}
+        color: white;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-
+st.markdown(
+    f"""
+    <div class="login-container">
+        <h1>🔒 Patient Engagement in Clinical Development 🧑‍⚕️💬</h1>
+        <h2>Public Partner Search Tool</h2>
+        <a href="{auth_url}" style="font-size:20px; padding:10px 20px;
+        background:#2F80ED; color:white; border-radius:8px; text-decoration:none;">
+        Sign in with Microsoft</a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
  
     st.stop()
 
@@ -610,6 +620,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
