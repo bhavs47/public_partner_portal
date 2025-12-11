@@ -130,22 +130,14 @@ def show_login_page():
     """,
     unsafe_allow_html=True
     )
-
-    # Top-left University of Leeds
-    st.markdown(
-        """
-        <div class="top-left">
-            University<br>of Leeds
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
+  
     # Centered heading and subheading
     st.markdown(
         """
         <div class="login-container">
-            <h2>Public Partner Search Tool</h2>
+            <h3>National Institute of Health and Research Care</h3>
+            <h2>Patient Engagement in Clinical Development</h2>
+            <h1>Public Partner Search Tool</h1>
             <a href="#" class="sign-in-button">Sign In</a>
         </div>
         """,
@@ -197,15 +189,6 @@ if "token_result" not in st.session_state:
     st.session_state["token_result"] = token_result
 else:
     token_result = st.session_state["token_result"]
-
-# -----------------------------
-# Check token + email
-# -----------------------------
-# if "access_token" not in token_result:
-#     st.error("❌ Authentication failed.")
-#     st.json(token_result)
-#     st.stop()
-
 
 
 # If no token or expired, show login
@@ -655,6 +638,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
