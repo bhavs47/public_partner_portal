@@ -149,7 +149,6 @@ if "token_result" not in st.session_state:
     if "code" not in query_params:
         show_login_page()
     else:
-        # redeem authorization code
         code = query_params["code"][0]
         token_result = msal_app.acquire_token_by_authorization_code(
             code=code,
@@ -169,6 +168,7 @@ if "access_token" not in token_result or token_result.get("error") in ["invalid_
 claims = token_result.get("id_token_claims", {})
 email = claims.get("preferred_username", "")
 name = claims.get("name") or email or "User"
+
 st.session_state["user_email"] = email
 st.session_state["user_name"] = name
 
@@ -176,6 +176,7 @@ if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
+# -----------------------------
 # Top-right Sign Out Button (Fixed Position)
 # -----------------------------
 
@@ -222,6 +223,14 @@ if st.query_params.get("signout") == ["true"]:
 
 if st.session_state.get("signout_clicked"):
     sign_out()
+
+
+
+
+
+
+
+
 
 # --------------------------------
 # Helper functions
@@ -650,6 +659,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
