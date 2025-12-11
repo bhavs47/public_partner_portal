@@ -164,18 +164,25 @@ if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-# Show Sign Out button (Streamlit native)
+# Top-right Sign Out button using CSS
 # -------------------------
-st.markdown("<div style='text-align:right; margin:10px;'>", unsafe_allow_html=True)
+st.markdown(
+    f"""
+    <div style='position:absolute; top:10px; right:10px; z-index:1000;'>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Use Streamlit native button for functionality
 if st.button("Sign Out"):
     sign_out()
-st.markdown("</div>", unsafe_allow_html=True)
+
 
 # -------------------------
 # Main app content
 # -------------------------
-st.write(f"Welcome, {email}!")
-# show_login_page()
+st.write(f"Welcome, {name}!")
 
 
 
@@ -606,6 +613,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
