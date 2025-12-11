@@ -136,36 +136,20 @@ def show_login_page():
 
 
 
-
 # -----------------------------
-# Sign Out Function
+# Sign Out
 # -----------------------------
 def sign_out():
-    # Remove all user-related session state
     for key in ["token_result", "user_email", "user_name", "logout_request"]:
         st.session_state.pop(key, None)
-    # Rerun the app to reflect logout
     st.experimental_rerun()
 
-
-# -----------------------------
-# Initialize session state for logout_request
-# -----------------------------
 if "logout_request" not in st.session_state:
     st.session_state["logout_request"] = False
 
-
-# -----------------------------
-# Detect logout
-# -----------------------------
-query_params = st.query_params
-
-# Trigger logout via URL query (?signout=true) or form/set session variable
 if query_params.get("signout") == ["true"] or st.session_state.get("logout_request", False):
     sign_out()
 
-
-# Example: logout via form submission
 with st.form("logout_form"):
     submitted = st.form_submit_button("Log Out")
     if submitted:
@@ -696,6 +680,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
