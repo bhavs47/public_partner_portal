@@ -115,7 +115,7 @@ def show_login_page():
         
         .hero-subtitle {{ 
             font-size: 1.5rem; 
-            margin-bottom: 30px; 
+            margin-bottom: 20px; 
         }}
         </style>
 
@@ -619,6 +619,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
