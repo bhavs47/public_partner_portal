@@ -43,7 +43,7 @@ query_params = st.experimental_get_query_params()
 def show_login_page():
     st.markdown(
         """
-        <h1 style='text-align:center; color:white;'>
+        <h1 style='text-align:center; color:black;'>
             National Institue of Health and Care Research <br> <br>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
@@ -61,7 +61,7 @@ def show_login_page():
    # Centered heading and subheading
     st.markdown(
     """
-    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
+    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:black;'>
         Public Partner Search Tool
     </h1>
     """,
@@ -624,6 +624,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
