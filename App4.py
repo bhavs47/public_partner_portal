@@ -145,8 +145,7 @@ def show_login_page():
     st.markdown(
         """
         <div class="login-container">
-            <h2>🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬</h2>
-            <h1>Public Partner Search Tool</h1>
+            <h2>Public Partner Search Tool</h2>
             <a href="#" class="sign-in-button">Sign In</a>
         </div>
         """,
@@ -656,6 +655,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
