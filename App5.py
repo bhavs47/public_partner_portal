@@ -35,7 +35,7 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-# -----------------------------
+# -------------------------
 # Prevent re-redeeming the code (store token_result in session_state)
 # -----------------------------
 query_params = st.experimental_get_query_params()
@@ -44,7 +44,7 @@ def show_login_page():
     st.markdown(
         """
         <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Research Care <br> <br>
+            National Institue of Health and Care Research <br> <br>
             🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
         </h1>
         """,
@@ -118,6 +118,15 @@ def show_login_page():
     )
     st.stop()
 
+# Function to sign out
+# -------------------------
+def sign_out():
+    if "token_result" in st.session_state:
+        st.session_state.pop("token_result")
+    if "user_email" in st.session_state:
+        st.session_state.pop("user_email")
+    st.experimental_rerun()  # reload the app to show login page
+
 
 if "token_result" not in st.session_state:
     if "code" not in query_params:
@@ -154,6 +163,39 @@ st.session_state["user_email"] = email
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
+
+# Top-right Sign Out as HTML button
+# -------------------------
+sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
+
+st.markdown(
+    """
+    <div style='position: right; top: 10px; right: 100px; z-index: 1000;'>
+        <a href="#" onclick="window.location.reload();" 
+            style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
+            Sign Out
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+if sign_out_clicked:
+    sign_out()
+
+
+
+# Ensure token_result and claims exist
+claims = token_result.get("id_token_claims", {})
+
+# Get user's name, fallback to email or "User"
+name = claims.get("name") or claims.get("preferred_username") or "User"
+
+st.session_state["user_name"] = name
+
+st.write(f"Welcome, {name}!")
+
+
 
 # --------------------------------
 # Helper functions
@@ -582,6 +624,22 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
