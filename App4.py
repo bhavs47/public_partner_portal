@@ -37,9 +37,10 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-# query_params = st.experimental_get_query_params()
+# -----------------------------
+# Read query params (modern API)
+# -----------------------------
 query_params = st.query_params
-
 
 # -----------------------------
 # Landing Page / Login
@@ -135,51 +136,60 @@ def show_login_page():
     )
     st.stop()
 
-
-
-
 # -----------------------------
-# Sign Out
+# Sign Out (clear session + clear URL params)
 # -----------------------------
-# def sign_out():
-#     for key in ["token_result", "user_email", "user_name"]:
-#         st.session_state.pop(key, None)
-#     st.experimental_rerun()
-
-
 def sign_out():
-    # Clear session state
-    for key in ["token_result", "user_email", "user_name"]:
+    # Clear session state keys related to auth
+    for key in ["token_result", "user_email", "user_name", "logout_request"]:
         st.session_state.pop(key, None)
 
-    # Clear query params (IMPORTANT!)
+    # IMPORTANT: clear query params so URL does not keep ?signout=true or ?code=...
     st.query_params = {}
 
-    # Rerun the app
+    # Rerun app to show login page
     st.experimental_rerun()
 
-# If user clicked the Sign Out button (?signout=true)
+# -----------------------------
+# Sign Out trigger (must be near top, before auth logic)
+# -----------------------------
+# This will catch when the Sign Out button sets the URL to ?signout=true
 if "signout" in query_params:
     sign_out()
-
-
 
 # -----------------------------
 # Handle Authentication
 # -----------------------------
 if "token_result" not in st.session_state:
-    if "code" not in query_params:
-        show_login_page()
-    else:
+    # If OAuth returned a code in the URL, handle it
+    if "code" in query_params:
         code = query_params["code"][0]
         token_result = msal_app.acquire_token_by_authorization_code(
             code=code,
             scopes=SCOPE,
             redirect_uri=REDIRECT_URI
         )
-        st.session_state["token_result"] = token_result
 
+        # If token acquired successfully, store it and clear ?code from URL
+        if token_result and "access_token" in token_result and token_result.get("error") is None:
+            st.session_state["token_result"] = token_result
+
+            # Remove code from URL so it won't be reused on reruns
+            st.query_params = {}
+            st.experimental_rerun()
+        else:
+            # token acquisition failed: ensure we don't keep a broken token and show login
+            st.session_state.pop("token_result", None)
+            # Optionally show an error - but return to login
+            st.warning("Sign-in failed. Please try again.")
+            show_login_page()
+    else:
+        # No token in session and no code in URL -> show login page
+        show_login_page()
+
+# If we reach here, token_result should be present in session
 token_result = st.session_state.get("token_result", {})
+# Validate token_result
 if "access_token" not in token_result or token_result.get("error") in ["invalid_grant", "bad_token"]:
     st.session_state.pop("token_result", None)
     show_login_page()
@@ -187,10 +197,11 @@ if "access_token" not in token_result or token_result.get("error") in ["invalid_
 # -----------------------------
 # Validate User
 # -----------------------------
-claims = token_result.get("id_token_claims", {})
-email = claims.get("preferred_username", "")
+claims = token_result.get("id_token_claims", {}) or {}
+email = claims.get("preferred_username", "") or ""
 name = claims.get("name") or email or "User"
 
+# Store for UI
 st.session_state["user_email"] = email
 st.session_state["user_name"] = name
 
@@ -233,21 +244,6 @@ st.html("""
         </button>
     </div>
 """)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # --------------------------------
 # Helper functions
@@ -309,9 +305,8 @@ def filter_dataframe(d, filters):
         # keep rows where the carer cell contains the selected carer option (as substring) or equals 'None'
         selected_carer = filters['carer']
         if selected_carer.lower() == "none":
-            dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip().isin(["none", "nan", ""] ) == False]  # careful: we'll interpret 'None' explicitly below
-            # Instead, better to keep rows whose carer column is empty or 'None'
-            dfc = dfc[dfc[filters['carer_col']].astype(str).str.strip().str.lower().isin(["none", "nan", ""] ) == False]
+            # Keep rows that are empty or explicitly 'None'
+            dfc = dfc[dfc[filters['carer_col']].astype(str).str.strip().str.lower().isin(["none", "nan", ""]) == True]
         else:
             # match if the split list contains the selected_carer
             mask = dfc[filters['carer_col']].astype(str).apply(
@@ -505,7 +500,6 @@ if carer_col and carer_col in df.columns:
         for p in parts:
             carer_options_set.add(p)
     # also include an explicit "None" if any cell equals 'None' (case-insensitive) or empty exists
-    # We'll include "None" if any cell is exactly 'None' or if there are empty/NaN cells
     if df[carer_col].dropna().astype(str).str.strip().str.lower().isin(["none"]).any() or df[carer_col].isna().any():
         carer_options_set.add("None")
 carer_options = ["Any"] + sorted(carer_options_set)
@@ -676,33 +670,3 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
