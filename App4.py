@@ -161,35 +161,38 @@ if "signout" in query_params:
 # Handle Authentication
 # -----------------------------
 if "token_result" not in st.session_state:
-    # If OAuth returned a code in the URL, handle it
-    if "code" in query_params:
+    if "code" not in query_params:
+        show_login_page()
+    else:
+        # Step 1 — grab the code from URL
         code = query_params["code"][0]
+
+        # Step 2 — redeem the code
         token_result = msal_app.acquire_token_by_authorization_code(
             code=code,
             scopes=SCOPE,
             redirect_uri=REDIRECT_URI
         )
 
-        # If token acquired successfully, store it and clear ?code from URL
-        if token_result and "access_token" in token_result and token_result.get("error") is None:
-            st.session_state["token_result"] = token_result
-
-            # Remove code from URL so it won't be reused on reruns
-            st.query_params = {}
-            st.experimental_rerun()
-        else:
-            # token acquisition failed: ensure we don't keep a broken token and show login
-            st.session_state.pop("token_result", None)
-            # Optionally show an error - but return to login
-            st.warning("Sign-in failed. Please try again.")
+        # Step 3 — if token acquisition failed
+        if "access_token" not in token_result:
+            st.error("❌ Sign-in Failed. Please try again.")
             show_login_page()
-    else:
-        # No token in session and no code in URL -> show login page
-        show_login_page()
 
-# If we reach here, token_result should be present in session
+        # Step 4 — save token in session
+        st.session_state["token_result"] = token_result
+
+        # Step 5 — IMPORTANT: remove ?code= from URL
+        st.query_params = {}
+
+        # Step 6 — rerun cleanly
+        st.experimental_rerun()
+
+
+#-----------------If we reach here, token_result should be present in session-----
 token_result = st.session_state.get("token_result", {})
-# Validate token_result
+
+#-------Validate token_result---------------
 if "access_token" not in token_result or token_result.get("error") in ["invalid_grant", "bad_token"]:
     st.session_state.pop("token_result", None)
     show_login_page()
@@ -670,3 +673,4 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
