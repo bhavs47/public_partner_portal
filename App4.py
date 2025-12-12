@@ -1,4 +1,4 @@
-# App4.py
+# App5.py
 """
 PECD Public Partner Search Tool - Combined PECD + EDI Data
 Run: streamlit run App4.py
@@ -37,10 +37,7 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-# -----------------------------
-# Read query params (modern API)
-# -----------------------------
-query_params = st.query_params
+query_params = st.experimental_get_query_params()
 
 # -----------------------------
 # Landing Page / Login
@@ -136,26 +133,16 @@ def show_login_page():
     )
     st.stop()
 
+
+
+
 # -----------------------------
-# Sign Out (clear session + clear URL params)
+# Sign Out
 # -----------------------------
 def sign_out():
-    # Clear session state keys related to auth
-    for key in ["token_result", "user_email", "user_name", "logout_request"]:
+    for key in ["token_result", "user_email", "user_name"]:
         st.session_state.pop(key, None)
-
-    # IMPORTANT: clear query params so URL does not keep ?signout=true or ?code=...
-    st.query_params = {}
-
-    # Rerun app to show login page
     st.experimental_rerun()
-
-# -----------------------------
-# Sign Out trigger (must be near top, before auth logic)
-# -----------------------------
-# This will catch when the Sign Out button sets the URL to ?signout=true
-if "signout" in query_params:
-    sign_out()
 
 # -----------------------------
 # Handle Authentication
@@ -164,35 +151,15 @@ if "token_result" not in st.session_state:
     if "code" not in query_params:
         show_login_page()
     else:
-        # Step 1 — grab the code from URL
         code = query_params["code"][0]
-
-        # Step 2 — redeem the code
         token_result = msal_app.acquire_token_by_authorization_code(
             code=code,
             scopes=SCOPE,
             redirect_uri=REDIRECT_URI
         )
-
-        # Step 3 — if token acquisition failed
-        if "access_token" not in token_result:
-            st.error("❌ Sign-in Failed. Please try again.")
-            show_login_page()
-
-        # Step 4 — save token in session
         st.session_state["token_result"] = token_result
 
-        # Step 5 — IMPORTANT: remove ?code= from URL
-        st.query_params = {}
-
-        # Step 6 — rerun cleanly
-        st.experimental_rerun()
-
-
-#-----------------If we reach here, token_result should be present in session-----
 token_result = st.session_state.get("token_result", {})
-
-#-------Validate token_result---------------
 if "access_token" not in token_result or token_result.get("error") in ["invalid_grant", "bad_token"]:
     st.session_state.pop("token_result", None)
     show_login_page()
@@ -200,11 +167,10 @@ if "access_token" not in token_result or token_result.get("error") in ["invalid_
 # -----------------------------
 # Validate User
 # -----------------------------
-claims = token_result.get("id_token_claims", {}) or {}
-email = claims.get("preferred_username", "") or ""
+claims = token_result.get("id_token_claims", {})
+email = claims.get("preferred_username", "")
 name = claims.get("name") or email or "User"
 
-# Store for UI
 st.session_state["user_email"] = email
 st.session_state["user_name"] = name
 
@@ -247,6 +213,21 @@ st.html("""
         </button>
     </div>
 """)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # --------------------------------
 # Helper functions
@@ -308,8 +289,9 @@ def filter_dataframe(d, filters):
         # keep rows where the carer cell contains the selected carer option (as substring) or equals 'None'
         selected_carer = filters['carer']
         if selected_carer.lower() == "none":
-            # Keep rows that are empty or explicitly 'None'
-            dfc = dfc[dfc[filters['carer_col']].astype(str).str.strip().str.lower().isin(["none", "nan", ""]) == True]
+            dfc = dfc[dfc[filters['carer_col']].astype(str).str.lower().str.strip().isin(["none", "nan", ""] ) == False]  # careful: we'll interpret 'None' explicitly below
+            # Instead, better to keep rows whose carer column is empty or 'None'
+            dfc = dfc[dfc[filters['carer_col']].astype(str).str.strip().str.lower().isin(["none", "nan", ""] ) == False]
         else:
             # match if the split list contains the selected_carer
             mask = dfc[filters['carer_col']].astype(str).apply(
@@ -503,6 +485,7 @@ if carer_col and carer_col in df.columns:
         for p in parts:
             carer_options_set.add(p)
     # also include an explicit "None" if any cell equals 'None' (case-insensitive) or empty exists
+    # We'll include "None" if any cell is exactly 'None' or if there are empty/NaN cells
     if df[carer_col].dropna().astype(str).str.strip().str.lower().isin(["none"]).any() or df[carer_col].isna().any():
         carer_options_set.add("None")
 carer_options = ["Any"] + sorted(carer_options_set)
@@ -673,4 +656,33 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
