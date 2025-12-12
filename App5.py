@@ -1,24 +1,26 @@
 # App4.py
 """
 PECD Public Partner Search Tool - Combined PECD + EDI Data
-Run: streamlit run app.py
+Run: streamlit run App4.py
 """
 
-from io import BytesIO
-from msal import ConfidentialClientApplication
+import uuid
 import json
+from io import BytesIO
+from datetime import date
 import pandas as pd
 import requests
 import streamlit as st
-import uuid
-from datetime import date
+from msal import ConfidentialClientApplication
 
 # -----------------------------
 # App Configuration
 # -----------------------------
 st.set_page_config(page_title="PECD Public Partner Search Tool", layout="wide")
 
-# 1️⃣ Load secrets safely (replace with Streamlit secrets)
+# -----------------------------
+# Load secrets
+# -----------------------------
 TENANT_ID = st.secrets["TENANT_ID"]
 CLIENT_ID = st.secrets["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
@@ -27,7 +29,7 @@ ALLOWED_EMAILS = st.secrets["ALLOWED_EMAILS"]  # list of allowed emails
 SCOPE = ["User.Read"]
 
 # -----------------------------
-# 2️⃣ Initialize MSAL ConfidentialClientApplication
+# Initialize MSAL App
 # -----------------------------
 msal_app = ConfidentialClientApplication(
     client_id=CLIENT_ID,
@@ -35,22 +37,12 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-# -------------------------
-# Prevent re-redeeming the code (store token_result in session_state)
-# -----------------------------
 query_params = st.experimental_get_query_params()
 
+# -----------------------------
+# Landing Page / Login
+# -----------------------------
 def show_login_page():
-    st.markdown(
-        """
-        <h1 style='text-align:center; color:white;'>
-            National Institue of Health and Care Research <br> <br>
-            🔐 Patient Engagement in Clinical Development 🧑‍⚕️💬
-        </h1>
-        """,
-        unsafe_allow_html=True
-    )
-
     auth_url = msal_app.get_authorization_request_url(
         scopes=SCOPE,
         redirect_uri=REDIRECT_URI,
@@ -58,142 +50,182 @@ def show_login_page():
         prompt="select_account"
     )
 
-   # Centered heading and subheading
     st.markdown(
-    """
-    <h1 style='text-align:center; margin-top:100px; margin-bottom:20px; color:white;'>
-        Public Partner Search Tool
-    </h1>
-    """,
-    unsafe_allow_html=True
-    )
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/NIHR.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: brightness(0.7);
+        }}
 
-    # Centered sign-in button
-    st.markdown(
-    f"""
-    <div style='text-align:center; margin-top:20px;'>
-        <a href="{auth_url}"
-            style="
-                font-size:20px;
-                padding:10px 20px;
-                background:#28a745;
-                color:white;
-                border-radius:8px;
-                text-decoration:none;
-            ">
-            Sign In
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True
-    )
+        /* MAIN TOP HEADING */
+        .top-heading {{
+            width: 100%;
+            text-align: center;
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-top: 40px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }}
 
+        .login-container {{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            text-align: center;
+            color: white;
+            animation: fadeIn 1.5s ease-in-out;
+            margin-top: -20px;
+        }}
 
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
 
-    #---- Background Image - University of Leeds ------------------
-    st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/bhavs47/public_partner_portal/main/University%20of%20Leeds.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        filter: brightness(0.7); /* optional darkening */
-    }
+        .login-button {{
+            font-size: 20px;
+            padding: 15px 35px;
+            background: linear-gradient(90deg, #28a745, #218838);
+            color: white !important;
+            border-radius: 10px;
+            text-decoration: none !important;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }}
 
-    .login-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        text-align: center;
-        color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+        .login-button:hover {{
+            transform: translateY(-3px);
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+            color: white !important;
+        }}
+
+        .hero-title {{
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }}
+
+        .hero-subtitle {{
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }}
+        </style>
+
+        <!-- TOP HEADING -->
+        <div class="top-heading">🔐 Patient Engagement in Clinical Development 🧑‍⚕️</div>
+
+        <!-- CENTERED CONTENT CONTAINER -->
+        <div class="login-container">
+            <div class="hero-title">PECD Public Partner Search Tool</div>
+            <a href="{auth_url}" class="login-button">Sign In</a>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
     st.stop()
 
-# Function to sign out
-# -------------------------
+
+
+
+# -----------------------------
+# Sign Out
+# -----------------------------
 def sign_out():
-    if "token_result" in st.session_state:
-        st.session_state.pop("token_result")
-    if "user_email" in st.session_state:
-        st.session_state.pop("user_email")
-    st.experimental_rerun()  # reload the app to show login page
+    for key in ["token_result", "user_email", "user_name"]:
+        st.session_state.pop(key, None)
+    st.experimental_rerun()
 
-
+# -----------------------------
+# Handle Authentication
+# -----------------------------
 if "token_result" not in st.session_state:
     if "code" not in query_params:
         show_login_page()
+    else:
+        code = query_params["code"][0]
+        token_result = msal_app.acquire_token_by_authorization_code(
+            code=code,
+            scopes=SCOPE,
+            redirect_uri=REDIRECT_URI
+        )
+        st.session_state["token_result"] = token_result
 
-    # Code exists: redeem once
-    code = query_params["code"][0]
-    token_result = msal_app.acquire_token_by_authorization_code(
-        code=code,
-        scopes=SCOPE,
-        redirect_uri=REDIRECT_URI
-    )
-    st.session_state["token_result"] = token_result
-else:
-    token_result = st.session_state["token_result"]
-
-
-# If no token or expired, show login
-if (
-    "access_token" not in token_result
-    or token_result.get("error") == "invalid_grant"
-    or token_result.get("suberror") == "bad_token"
-):
-    # Reset session to clean state
+token_result = st.session_state.get("token_result", {})
+if "access_token" not in token_result or token_result.get("error") in ["invalid_grant", "bad_token"]:
     st.session_state.pop("token_result", None)
-
-    # Show login again
     show_login_page()
 
+# -----------------------------
+# Validate User
+# -----------------------------
+claims = token_result.get("id_token_claims", {})
+email = claims.get("preferred_username", "")
+name = claims.get("name") or email or "User"
 
-email = token_result["id_token_claims"].get("preferred_username")
 st.session_state["user_email"] = email
+st.session_state["user_name"] = name
 
 if email not in ALLOWED_EMAILS:
     st.error("❌ You do not have permission to access this tool.")
     st.stop()
 
-# Top-right Sign Out as HTML button
-# -------------------------
-sign_out_clicked = st.button("Sign Out")  # fallback for mobile and accessibility
+# -----------------------------
+# Top-right Sign Out Button (Streamlit-native)
+# -----------------------------
+st.markdown("""
+    <style>
+        div[data-testid="stToolbar"] {visibility: hidden;}
 
-st.markdown(
-    """
-    <div style='position: right; top: 10px; right: 100px; z-index: 1000;'>
-        <a href="#" onclick="window.location.reload();" 
-            style='font-size:16px; padding:5px 10px; background:#FF4B4B; color:white; border-radius:5px; text-decoration:none;'>
+        .signout-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .signout-container {
+            position: fixed;
+            top: 15px;
+            right: 25px;
+            z-index: 999999 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+
+# --- FIXED POSITION SIGN OUT BUTTON ---
+st.html("""
+    <div class="signout-container">
+        <button class="signout-btn" onclick="window.location.href='?signout=true'">
             Sign Out
-        </a>
+        </button>
     </div>
-    """,
-    unsafe_allow_html=True
-)
-
-if sign_out_clicked:
-    sign_out()
+""")
 
 
 
-# Ensure token_result and claims exist
-claims = token_result.get("id_token_claims", {})
 
-# Get user's name, fallback to email or "User"
-name = claims.get("name") or claims.get("preferred_username") or "User"
 
-st.session_state["user_name"] = name
 
-st.write(f"Welcome, {name}!")
+
+
+
+
+
+
+
 
 
 
@@ -624,31 +656,6 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
