@@ -37,7 +37,9 @@ msal_app = ConfidentialClientApplication(
     authority=f"https://login.microsoftonline.com/{TENANT_ID}"
 )
 
-query_params = st.experimental_get_query_params()
+# query_params = st.experimental_get_query_params()
+query_params = st.query_params
+
 
 # -----------------------------
 # Landing Page / Login
@@ -139,10 +141,28 @@ def show_login_page():
 # -----------------------------
 # Sign Out
 # -----------------------------
+# def sign_out():
+#     for key in ["token_result", "user_email", "user_name"]:
+#         st.session_state.pop(key, None)
+#     st.experimental_rerun()
+
+
 def sign_out():
+    # Clear session state
     for key in ["token_result", "user_email", "user_name"]:
         st.session_state.pop(key, None)
+
+    # Clear query params (IMPORTANT!)
+    st.query_params = {}
+
+    # Rerun the app
     st.experimental_rerun()
+
+# If user clicked the Sign Out button (?signout=true)
+if "signout" in query_params:
+    sign_out()
+
+
 
 # -----------------------------
 # Handle Authentication
@@ -656,6 +676,7 @@ st.markdown(
     "Tips: The page merges PECD Pool Data (left) and EDI Data (appended columns) by ID. "
     "Use the filters above to narrow results. You may replace the dataset URLs at the top of the file."
 )
+
 
 
 
